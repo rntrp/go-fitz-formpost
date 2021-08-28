@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  web:
+    container_name: go-fitz-rest-example
+    image: go-fitz-rest-example:latest
+    restart: "no"
+    build: .
+    ports:
+      - "8080:8080"
