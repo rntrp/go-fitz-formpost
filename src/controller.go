@@ -76,24 +76,29 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFormat(format string) imaging.Format {
-	switch (strings.ToLower(format)) {
-	case "png": return imaging.PNG
-	case "gif": return imaging.GIF
-	case "tif", "tiff": return imaging.TIFF
-	case "bmp", "dib": return imaging.BMP
-	default: return imaging.JPEG
+	switch strings.ToLower(format) {
+	case "png":
+		return imaging.PNG
+	case "gif":
+		return imaging.GIF
+	case "tif", "tiff":
+		return imaging.TIFF
+	case "bmp", "dib":
+		return imaging.BMP
+	default:
+		return imaging.JPEG
 	}
 }
 
 func printMemUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	bToMiB := func (b uint64) string {
-		return strconv.FormatFloat(float64(b) / 1_048_576, 'f', 3, 64)
+	bToMiB := func(b uint64) string {
+		return strconv.FormatFloat(float64(b)/1_048_576, 'f', 3, 64)
 	}
-	fmt.Printf("Alloc = %v MiB" +
-		"\tTotalAlloc = %v MiB" +
-		"\tSys = %v MiB" +
+	fmt.Printf("Alloc = %v MiB"+
+		"\tTotalAlloc = %v MiB"+
+		"\tSys = %v MiB"+
 		"\tNumGC = %v\n",
 		bToMiB(m.Alloc),
 		bToMiB(m.TotalAlloc),
