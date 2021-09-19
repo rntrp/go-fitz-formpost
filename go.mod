@@ -1,4 +1,4 @@
-module example.com/fitz-rest
+module github.com/rntrp/go-fitz-rest-example
 
 go 1.16
 

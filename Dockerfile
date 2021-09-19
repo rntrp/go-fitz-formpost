@@ -24,10 +24,11 @@ RUN apk add --no-cache \
 WORKDIR /app
 COPY go.mod ./
 COPY go.sum ./
-COPY src/*.go ./
+COPY main.go ./
+COPY internal ./internal
 RUN export CGO_LDFLAGS="-lmupdf -lm -lmupdf-third -lfreetype -ljbig2dec -lharfbuzz -ljpeg -lopenjp2 -lz" \
     && go mod download \
-    && go test \
+    && go test ./... \
     && go build -o /go-fitz-rest \
     && apk del .build-deps \
     && rm -rf /tmp/*

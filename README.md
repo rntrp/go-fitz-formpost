@@ -15,7 +15,6 @@ Note, that `harfbuzz` [isn't listed as a dependency in MuPDF docs](https://mupdf
 
 Finally, run the application at port 8080:
 ```bash
-$ cd src
 $ go run .
 ```
 
