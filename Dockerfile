@@ -1,11 +1,11 @@
-FROM golang:1.16-alpine3.14 AS builder
+FROM golang:1.17-alpine3.14 AS builder
 RUN apk add --no-cache \
         build-base \
         freetype-dev \
         harfbuzz-dev \
         jbig2dec-dev \
         jpeg-dev \
-        mupdf-dev \
+        mupdf mupdf-dev \
         openjpeg-dev \
         zlib-dev
 WORKDIR /app
@@ -32,6 +32,6 @@ RUN apk add --no-cache \
         mupdf \
         openjpeg \
         zlib
-COPY --from=build /go-fitz-rest ./
+COPY --from=builder /go-fitz-rest ./
 EXPOSE 8080
 CMD [ "/go-fitz-rest" ]

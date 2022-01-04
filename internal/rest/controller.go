@@ -2,106 +2,85 @@ package rest
 
 import (
 	"fmt"
-	"image"
-	"image/draw"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"runtime"
-	"strconv"
-	"strings"
 
-	"github.com/disintegration/imaging"
-	"github.com/gen2brain/go-fitz"
+	"github.com/rntrp/go-fitz-rest-example/internal/config"
+	"github.com/rntrp/go-fitz-rest-example/internal/fitzimg"
 )
 
-const maxMemory int64 = 1024 * 64
-const maxFileSize int64 = 1024 * 1024 * 512
-
-func Welcome(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("welcome"))
-}
-
 func Scale(w http.ResponseWriter, r *http.Request) {
-	printMemUsage()
 	query := r.URL.Query()
-	width, _ := strconv.Atoi(query.Get("width"))
-	height, _ := strconv.Atoi(query.Get("height"))
-	format := getFormat(query.Get("format"))
-	if err := r.ParseMultipartForm(maxMemory); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
+	width, errW := coerceWidth(query.Get("width"))
+	height, errH := coerceHeight(query.Get("height"))
+	pageStart, pageEnd, errP := coercePages(query.Get("pages"))
+	format, errF := coerceFormat(query.Get("format"))
+	archive, errO := coerceArchive(query.Get("archive"))
+	quality, errQ := coerceQuality(format, query.Get("quality"))
+	resize, errRZ := coerceResize(query.Get("resize"))
+	resample, errRF := coerceResample(query.Get("resample"))
+	for _, err := range []error{errW, errH, errP, errF, errO, errQ, errRZ, errRF} {
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+	if pageStart != pageEnd && archive == fitzimg.Raw {
+		http.Error(w, "Invalid archive format", http.StatusBadRequest)
 		return
+	} else if err := r.ParseMultipartForm(config.GetMemoryBufferSize()); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if r.MultipartForm != nil {
+		defer r.MultipartForm.RemoveAll()
 	}
 	f, fh, err := r.FormFile("pdf")
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("File 'pdf' could not be processed."))
+		http.Error(w, "File 'pdf' is missing", http.StatusBadRequest)
 		return
 	}
 	defer f.Close()
-	if fh.Size > maxFileSize {
-		w.WriteHeader(http.StatusRequestEntityTooLarge)
-		fmt.Fprintf(w, "Max file size is %d", maxFileSize)
+	if fh.Size > config.GetMaxFileSize() {
+		http.Error(w, fmt.Sprintf("Max file size is %d", config.GetMaxFileSize()),
+			http.StatusRequestEntityTooLarge)
 		return
 	}
-	doc, err := fitz.NewFromReader(f)
+	input, err := ioutil.ReadAll(f)
 	if err != nil {
 		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError)
 		return
 	}
-	defer doc.Close()
-	tmp, err := ioutil.TempFile("", "fitz.*.png")
+	numPages, err := fitzimg.NumPages(input)
 	if err != nil {
 		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError)
+		return
+	} else if pageEnd == LastPage {
+		pageEnd = numPages
+	}
+	if err := checkPageRange(pageStart, pageEnd, numPages); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer os.Remove(tmp.Name())
-	page1, err := doc.ImageDPI(0, 72.0)
-	if err != nil {
+	params := &fitzimg.Params{
+		Width:     width,
+		Height:    height,
+		FirstPage: pageStart - 1,
+		LastPage:  pageEnd - 1,
+		Archive:   archive,
+		Format:    format,
+		Quality:   quality,
+		Resize:    resize,
+		Resample:  resample,
+	}
+	ext, mime := getOutputFileMeta(archive, format)
+	w.Header().Set("Content-Disposition", "attachment; filename=result"+ext)
+	w.Header().Set("Content-Type", mime)
+	if err := fitzimg.Scale(input, w, params); err != nil {
 		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
 	}
-	resized := imaging.Fit(page1, width, height, imaging.Box)
-	background := image.NewNRGBA(image.Rect(0, 0, width, height))
-	draw.Draw(background, background.Bounds(), image.White, image.ZP, draw.Src)
-	out := imaging.OverlayCenter(background, resized, 1.0)
-	imaging.Encode(w, out, format,
-		imaging.JPEGQuality(99), imaging.PNGCompressionLevel(9))
-	printMemUsage()
-}
-
-func getFormat(format string) imaging.Format {
-	switch strings.ToLower(format) {
-	case "png":
-		return imaging.PNG
-	case "gif":
-		return imaging.GIF
-	case "tif", "tiff":
-		return imaging.TIFF
-	case "bmp", "dib":
-		return imaging.BMP
-	default:
-		return imaging.JPEG
-	}
-}
-
-func printMemUsage() {
-	var m runtime.MemStats
-	runtime.ReadMemStats(&m)
-	bToMiB := func(b uint64) string {
-		return strconv.FormatFloat(float64(b)/1_048_576, 'f', 3, 64)
-	}
-	fmt.Printf("Alloc = %v MiB"+
-		"\tTotalAlloc = %v MiB"+
-		"\tSys = %v MiB"+
-		"\tNumGC = %v\n",
-		bToMiB(m.Alloc),
-		bToMiB(m.TotalAlloc),
-		bToMiB(m.Sys),
-		m.NumGC)
 }
