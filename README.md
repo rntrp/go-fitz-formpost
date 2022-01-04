@@ -44,11 +44,11 @@ Alternatively, there is also `test.html` with HTML `form` and `input`. While exp
 | `width` | yes | Min: `1`; Max: `65536` (theoretical). |
 | `height` | yes | Min: `1`; Max: `65536` (theoretical). |
 | `format` | yes | `jpg`, `jpeg`, `png`, `gif`, `tif`, `tiff`, `bmp`. |
-| `pages` | no | Range `m-n` with `1-8388606` being the max theoretical range. If `n` is larger than the actual page count, an HTTP 400 is returned. Special case `pages=m`, equivalent to `pages=m-m`, indicating a single page is allowed. Using underscore for the last page is also possible, e.g. `pages=1-_` for all pages of the document. |
+| `pages` | no | Range `m-n` with `1-8388606` being the max theoretical range. If `n` is larger than the actual page count, an HTTP 400 is returned. Special case `pages=m`, equivalent to `pages=m-m`, indicating a single page is allowed. Using underscore for the last page is also possible, e.g. `pages=1-_` for all pages of the document. Default is the first page. |
 | `archive` | yes/no | If a page range `m-n` is specified with `m`≠`n`, then providing an archive format is mandatory. `zip` and `tar` are possible values for a ZIP archive and a Tarball respectively. |
 | `quality` | no | From `1` to `100` for JPEG (default `95`); `0` to `9` for PNG (default `6`). |
 | `resize` | no | Image resizing mode for cases when the source document has a different aspect ratio than specified by the target dimensions. |
-| `resample` | no | Resamling algorithm, affection both quality and performance. |
+| `resample` | no | Resamling algorithm, affects both quality and performance. |
 
 ## License
 Inherits AGPLv3 from `go-fitz` and MuPDF.
