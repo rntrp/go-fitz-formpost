@@ -27,6 +27,7 @@ func interleave(src []byte, dst io.Writer, params *Params) error {
 		n := name(page, params.Format)
 		if err := transfer(duo[page&1], out, n, params); err != nil {
 			atomic.StoreInt32(&cancel, 1)
+			<-receive
 			return err
 		}
 	}
