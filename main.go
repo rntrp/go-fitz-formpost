@@ -43,6 +43,7 @@ func server(sig chan os.Signal) *http.Server {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/live", rest.Live)
+	r.Post("/pages", rest.NumPage)
 	r.Post("/scale", rest.Scale)
 	if config.IsEnablePrometheus() {
 		r.Handle("/metrics", promhttp.Handler())

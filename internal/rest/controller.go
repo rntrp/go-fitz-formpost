@@ -10,6 +10,22 @@ import (
 	"github.com/rntrp/go-fitz-rest-example/internal/fitzimg"
 )
 
+func NumPage(w http.ResponseWriter, r *http.Request) {
+	input := handleFileUpload(w, r)
+	if input == nil {
+		return
+	}
+	numPage, err := fitzimg.NumPage(input)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	fmt.Fprintf(w, "%d", numPage)
+}
+
 func Scale(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	width, errW := coerceWidth(query.Get("width"))
@@ -29,40 +45,21 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 	if pageStart != pageEnd && archive == fitzimg.Raw {
 		http.Error(w, "Invalid archive format", http.StatusBadRequest)
 		return
-	} else if err := r.ParseMultipartForm(config.GetMemoryBufferSize()); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	} else if r.MultipartForm != nil {
-		defer r.MultipartForm.RemoveAll()
 	}
-	f, fh, err := r.FormFile("pdf")
-	if err != nil {
-		http.Error(w, "File 'pdf' is missing", http.StatusBadRequest)
+	input := handleFileUpload(w, r)
+	if input == nil {
 		return
 	}
-	defer f.Close()
-	if fh.Size > config.GetMaxFileSize() {
-		http.Error(w, fmt.Sprintf("Max file size is %d", config.GetMaxFileSize()),
-			http.StatusRequestEntityTooLarge)
-		return
-	}
-	input, err := ioutil.ReadAll(f)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError),
-			http.StatusInternalServerError)
-		return
-	}
-	numPages, err := fitzimg.NumPages(input)
+	numPage, err := fitzimg.NumPage(input)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError),
 			http.StatusInternalServerError)
 		return
 	} else if pageEnd == LastPage {
-		pageEnd = numPages
+		pageEnd = numPage
 	}
-	if err := checkPageRange(pageStart, pageEnd, numPages); err != nil {
+	if err := checkPageRange(pageStart, pageEnd, numPage); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -83,4 +80,32 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 	if err := fitzimg.Scale(input, w, params); err != nil {
 		log.Println(err)
 	}
+}
+
+func handleFileUpload(w http.ResponseWriter, r *http.Request) []byte {
+	if err := r.ParseMultipartForm(config.GetMemoryBufferSize()); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return nil
+	} else if r.MultipartForm != nil {
+		defer r.MultipartForm.RemoveAll()
+	}
+	f, fh, err := r.FormFile("pdf")
+	if err != nil {
+		http.Error(w, "File 'pdf' is missing", http.StatusBadRequest)
+		return nil
+	}
+	defer f.Close()
+	if fh.Size > config.GetMaxFileSize() {
+		http.Error(w, fmt.Sprintf("Max file size is %d", config.GetMaxFileSize()),
+			http.StatusRequestEntityTooLarge)
+		return nil
+	}
+	input, err := ioutil.ReadAll(f)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError)
+		return nil
+	}
+	return input
 }

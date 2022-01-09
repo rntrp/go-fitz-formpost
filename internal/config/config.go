@@ -2,9 +2,11 @@ package config
 
 import (
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -12,18 +14,18 @@ import (
 
 func Load() {
 	// https://github.com/joho/godotenv#precedence--conventions
-	env := os.Getenv("FITZREST_ENV")
-	if len(env) == 0 {
-		env = "development"
+	v.FITZREST_ENV = os.Getenv("FITZREST_ENV")
+	if len(v.FITZREST_ENV) == 0 {
+		v.FITZREST_ENV = "development"
 	}
-	path := os.Getenv("FITZREST_ENV_DIR")
-	tryLoad(path, ".env."+env+".local")
-	if env != "test" {
-		tryLoad(path, ".env.local")
+	v.FITZREST_ENV_DIR = os.Getenv("FITZREST_ENV_DIR")
+	tryLoad(v.FITZREST_ENV_DIR, ".env."+v.FITZREST_ENV+".local")
+	if v.FITZREST_ENV != "test" {
+		tryLoad(v.FITZREST_ENV_DIR, ".env.local")
 	}
-	tryLoad(path, ".env."+env)
-	tryLoad(path, ".env")
-	initValues()
+	tryLoad(v.FITZREST_ENV_DIR, ".env."+v.FITZREST_ENV)
+	tryLoad(v.FITZREST_ENV_DIR, ".env")
+	loadNonSecrets()
 }
 
 func tryLoad(path, file string) {
@@ -33,14 +35,15 @@ func tryLoad(path, file string) {
 	}
 }
 
-func initValues() {
-	v.tcpAddress = parseString("FITZREST_TCP_ADDRESS", ":8080")
-	v.tempDir = parseString("FITZREST_TEMP_DIR", "")
-	v.maxFileSize = parseInt64("FITZREST_MAX_FILE_SIZE", 1024*1024*512)
-	v.memoryBufferSize = parseInt64("FITZREST_MEMORY_BUFFER_SIZE", 1024*64)
-	v.enablePrometheus = parseBool("FITZREST_ENABLE_PROMETHEUS", true)
-	v.enablePrometheus = parseBool("FITZREST_ENABLE_SHUTDOWN_ENDPOINT", false)
-	v.shutdownTimeout = parseDuration("FITZREST_SHUTDOWN_TIMEOUT_SECONDS", 0, time.Second)
+func loadNonSecrets() {
+	v.FITZREST_TCP_ADDRESS = parseString("FITZREST_TCP_ADDRESS", ":8080")
+	v.FITZREST_TEMP_DIR = parseString("FITZREST_TEMP_DIR", "")
+	v.FITZREST_MAX_FILE_SIZE = parseInt64("FITZREST_MAX_FILE_SIZE", math.MaxInt64)
+	v.FITZREST_MEMORY_BUFFER_SIZE = parseInt64("FITZREST_MEMORY_BUFFER_SIZE", 1<<16)
+	v.FITZREST_ENABLE_PROMETHEUS = parseBool("FITZREST_ENABLE_PROMETHEUS", false)
+	v.FITZREST_ENABLE_SHUTDOWN_ENDPOINT = parseBool("FITZREST_ENABLE_SHUTDOWN_ENDPOINT", false)
+	v.FITZREST_SHUTDOWN_TIMEOUT_SECONDS = parseDuration("FITZREST_SHUTDOWN_TIMEOUT_SECONDS", 0, time.Second)
+	v.FITZREST_PROCESSING_MODE = parseProcessingMode("FITZREST_PROCESSING_MODE", Serialized)
 }
 
 func parseBool(env string, def bool) bool {
@@ -65,5 +68,12 @@ func parseInt64(env string, def int64) int64 {
 }
 
 func parseDuration(env string, def int64, unit time.Duration) time.Duration {
-	return time.Duration(parseInt64(env, def)) * unit
+	return time.Duration(parseInt64(os.Getenv(env), def)) * unit
+}
+
+func parseProcessingMode(env string, def ProcessingMode) ProcessingMode {
+	if pm, ok := processingModeStrings[strings.ToLower(os.Getenv(env))]; ok {
+		return pm
+	}
+	return def
 }
