@@ -32,7 +32,7 @@ func interleave(src []byte, dst io.Writer, params *Params) error {
 		}
 	}
 	if closer != nil {
-		closer.Close()
+		return closer.Close()
 	}
 	return nil
 }
