@@ -58,11 +58,13 @@ type ProcessingMode int
 const (
 	Serialized ProcessingMode = iota
 	Interleaved
+	InMemory
 )
 
 var processingModeStrings = map[string]ProcessingMode{
 	"serialized":  Serialized,
 	"interleaved": Interleaved,
+	"inmemory":    InMemory,
 }
 
 func GetProcessingMode() ProcessingMode {

@@ -20,6 +20,8 @@ func Scale(src []byte, dst io.Writer, params *Params) error {
 	switch config.GetProcessingMode() {
 	case config.Interleaved:
 		return interleave(src, dst, params)
+	case config.InMemory:
+		return inMemory(src, dst, params)
 	default:
 		return serial(src, dst, params)
 	}
