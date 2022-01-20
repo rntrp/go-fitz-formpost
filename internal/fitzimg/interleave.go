@@ -7,7 +7,9 @@ import (
 )
 
 func interleave(src []byte, dst io.Writer, params *Params) error {
-	if params.FirstPage == params.LastPage {
+	from := params.FirstPage
+	to := params.LastPage
+	if from == to {
 		// Fallback to serial for single pages
 		return serial(src, dst, params)
 	}
@@ -20,7 +22,7 @@ func interleave(src []byte, dst io.Writer, params *Params) error {
 	receive := make(chan error, 1)
 	cancel := int32(0)
 	go work(receive, &cancel, src, duo, params)
-	for page := params.FirstPage; page <= params.LastPage; page++ {
+	for page := from; page <= to; page++ {
 		if err := <-receive; err != nil {
 			return err
 		}

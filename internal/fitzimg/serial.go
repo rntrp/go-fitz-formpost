@@ -10,7 +10,9 @@ func serial(src []byte, dst io.Writer, params *Params) error {
 	defer removeTmp(tmp)
 	out, closer := initArchive(params.Archive, dst)
 	bkg := background(params.Width, params.Height, params.Resize)
-	for page := params.FirstPage; page <= params.LastPage; page++ {
+	from := params.FirstPage
+	to := params.LastPage
+	for page := from; page <= to; page++ {
 		if err := process(src, bkg, tmp, out, page, params); err != nil {
 			return err
 		}
