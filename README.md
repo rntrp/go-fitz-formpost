@@ -43,7 +43,7 @@ The application supports configuration via environment variables or a `.env` fil
 
 | variable | default | description |
 |---|---|---|
-| `FITZREST_ENV` | `development` | Currently, this setting only affects the [`.env` file precedence.](https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use), no actual distinction between execution environments is made. Possible values are `development`, `test` and `production`. |
+| `FITZREST_ENV` | `development` | Currently, this setting only affects the [`.env` file precedence](https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use), no actual distinction between execution environments is made. Possible values are `development`, `test` and `production`. |
 | `FITZREST_ENV_DIR` | _empty_ | Path to directory containing the `.env` file. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, `.env` file is read from the application folder. |
 | `FITZREST_TCP_ADDRESS` | `:8080` | Application TCP address as described by the Golang's `http.Server.Addr` field, most prominently in form of `host:port`. See also [`net` package docs](https://pkg.go.dev/net). |
 | `FITZREST_TEMP_DIR` | _empty_ | Path to directory, where applications's temporary files are managed. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, operating system's default temporary directory is used. |
@@ -55,11 +55,11 @@ The application supports configuration via environment variables or a `.env` fil
 | `FITZREST_PROCESSING_MODE` | `serialized` | Choose between `serialized`, `interleaved` and `inmemory` processing modes. |
 
 #### Processing Modes
-| variable | description |
+| value | description |
 |---|---|
-| `serialized` | |
-| `interleaved` | |
-| `inmemory` | |
+| `serialized` | Standard processing mode. First, image output is written to a local temporary file. Contents of the file are then transferred as part of the response. The process is repeated for every following page requested. This allows for a single temporary file to be reused, hence minimizing required free disk space. |
+| `interleaved` | Slightly enhanced version of the serialized mode. Two temporary files are created, with two goroutines writing images and transferring the contents interchangeably. While the first goroutine is encoding the document page, the second one is busy with serving the image of the previous page. This helps to increase throughput on such systems where the network speed is slower or merely faster than the encoding performance. This comes at a cost of two temporary files needes to be present on disk during processing. If network speed clearly dominates over encoding, then the advantage is insignificant. |
+| `inmemory` | Processing is done completely in memory, hence no temporary files are created. May be susceptible to DoS attacks, if the client issues too many requests while artificially cutting down the network throughput, so that many files remain in memory at the same point in time. |
 
 ### Parameters
 | parameter | mandatory | value |
