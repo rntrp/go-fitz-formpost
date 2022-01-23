@@ -49,7 +49,7 @@ func server(sig chan os.Signal) *http.Server {
 		r.Handle("/metrics", promhttp.Handler())
 	}
 	if config.IsEnableShutdown() {
-		r.Get("/shutdown", shutdownFn(sig))
+		r.Post("/shutdown", shutdownFn(sig))
 	}
 	return &http.Server{Addr: config.GetTCPAddress(), Handler: r}
 }
