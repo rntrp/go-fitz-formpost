@@ -38,6 +38,29 @@ $ curl -F pdf=@/path/to/in.pdf -o /path/to/out.png http://localhost:8080/scale?w
 
 Alternatively, there is also `test.html` with HTML `form` and `input`. While experimenting, just edit the `form action` URL.
 
+### Environment Variables
+The application supports configuration via environment variables or a `.env` file. Environment variables have higher priority.
+
+| variable | default | description |
+|---|---|---|
+| `FITZREST_ENV` | `development` | Currently, this setting only affects the [`.env` file precedence.](https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use), no actual distinction between execution environments is made. Possible values are `development`, `test` and `production`. |
+| `FITZREST_ENV_DIR` | _empty_ | Path to directory containing the `.env` file. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, `.env` file is read from the application folder. |
+| `FITZREST_TCP_ADDRESS` | `:8080` | Application TCP address as described by the Golang's `http.Server.Addr` field, most prominently in form of `host:port`. See also [`net` package docs](https://pkg.go.dev/net). |
+| `FITZREST_TEMP_DIR` | _empty_ | Path to directory, where applications's temporary files are managed. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, operating system's default temporary directory is used. |
+| `FITZREST_MAX_FILE_SIZE` | `9223372036854775807` | Maximum size of a file in bytes, which can be processed by the application. If the file size limit is exceeded, then HTTP 413 is returned. By default, a theoretical maximum of `math.MaxInt64`, i.e. 2⁶³-1 bytes or 8 exbibytes is set, which allows for practically unlimited file sizes. |
+| `FITZREST_MEMORY_BUFFER_SIZE` | `65536` | Maximum number of bytes stored in memory when uploading files. If the file size is exceeding this number, then the remaining bytes are dumped onto the filesystem. |
+| `FITZREST_ENABLE_PROMETHEUS` | `false` | Expose application metrics via [Prometheus](https://prometheus.io) endpoint `/metrics`. |
+| `FITZREST_ENABLE_SHUTDOWN_ENDPOINT` | `false` | Enable shutdown endpoint under `/shutdown`. A single POST request with arbitrary payload to this endpoint will cause the application to shutdown gracefully. |
+| `FITZREST_SHUTDOWN_TIMEOUT_SECONDS` | `0` | Specifies amount of seconds to wait before ongoing requests are forcefully cancelled in order to perform a graceful shutdown. A zero value lets the application wait indefinetely for all requests to complete. |
+| `FITZREST_PROCESSING_MODE` | `serialized` | Choose between `serialized`, `interleaved` and `inmemory` processing modes. |
+
+#### Processing Modes
+| variable | description |
+|---|---|
+| `serialized` | |
+| `interleaved` | |
+| `inmemory` | |
+
 ### Parameters
 | parameter | mandatory | value |
 |---|:---:|---|
