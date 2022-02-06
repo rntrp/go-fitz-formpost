@@ -3,6 +3,7 @@ package rest
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -31,6 +32,19 @@ const MaxPage = 8_388_606
 const DefaultPage = 1
 
 const LastPage = -1
+
+func coerceContentLength(contentLength string) (int64, error) {
+	return strconv.ParseInt(contentLength, 10, 64)
+}
+
+const MaxMemoryBufferSize = int64(math.MaxInt64) - 1
+
+func coerceMemoryBufferSize(memoryBufferSize int64) int64 {
+	if memoryBufferSize < 0 || memoryBufferSize > MaxMemoryBufferSize {
+		return MaxMemoryBufferSize
+	}
+	return memoryBufferSize
+}
 
 func coercePages(dim string) (int, int, error) {
 	if len(dim) == 0 {

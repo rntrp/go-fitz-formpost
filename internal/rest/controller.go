@@ -83,23 +83,29 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleFileUpload(w http.ResponseWriter, r *http.Request) []byte {
-	if err := r.ParseMultipartForm(config.GetMemoryBufferSize()); err != nil {
+	maxReqSize := config.GetMaxRequestSize()
+	if maxReqSize >= 0 {
+		clen, err := coerceContentLength(r.Header.Get("Content-Length"))
+		if err == nil && clen > maxReqSize {
+			http.Error(w, "http: Content-Length too large",
+				http.StatusRequestEntityTooLarge)
+			return nil
+		}
+		r.Body = http.MaxBytesReader(w, r.Body, maxReqSize)
+	}
+	memBufSize := coerceMemoryBufferSize(config.GetMemoryBufferSize())
+	if err := r.ParseMultipartForm(memBufSize); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return nil
 	} else if r.MultipartForm != nil {
 		defer r.MultipartForm.RemoveAll()
 	}
-	f, fh, err := r.FormFile("pdf")
+	f, _, err := r.FormFile("pdf")
 	if err != nil {
 		http.Error(w, "File 'pdf' is missing", http.StatusBadRequest)
 		return nil
 	}
 	defer f.Close()
-	if fh.Size > config.GetMaxFileSize() {
-		http.Error(w, fmt.Sprintf("Max file size is %d", config.GetMaxFileSize()),
-			http.StatusRequestEntityTooLarge)
-		return nil
-	}
 	input, err := ioutil.ReadAll(f)
 	if err != nil {
 		log.Println(err)

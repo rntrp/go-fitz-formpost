@@ -11,7 +11,7 @@ export CGO_LDFLAGS="-lmupdf -lm -lmupdf-third -lfreetype -ljbig2dec -lharfbuzz -
     && go build -o /go-fitz-rest
 ```
 
-Note, that `harfbuzz` [isn't listed as a dependency in MuPDF docs](https://mupdf.com/docs/building.html), but is indeed required.
+Note that `harfbuzz` [isn't listed as a dependency in MuPDF docs](https://mupdf.com/docs/building.html), but is indeed required.
 
 Finally, run the application at port 8080:
 ```bash
@@ -46,9 +46,9 @@ The application supports configuration via environment variables or a `.env` fil
 | `FITZREST_ENV` | `development` | Currently, this setting only affects the [`.env` file precedence](https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use), no actual distinction between execution environments is made. Possible values are `development`, `test` and `production`. |
 | `FITZREST_ENV_DIR` | _empty_ | Path to directory containing the `.env` file. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, `.env` file is read from the application folder. |
 | `FITZREST_TCP_ADDRESS` | `:8080` | Application TCP address as described by the Golang's `http.Server.Addr` field, most prominently in form of `host:port`. See also [`net` package docs](https://pkg.go.dev/net). |
-| `FITZREST_TEMP_DIR` | _empty_ | Path to directory, where applications's temporary files are managed. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, operating system's default temporary directory is used. |
-| `FITZREST_MAX_FILE_SIZE` | `9223372036854775807` | Maximum size of a file in bytes, which can be processed by the application. If the file size limit is exceeded, then HTTP 413 is returned. By default, a theoretical maximum of `math.MaxInt64`, i.e. 2⁶³-1 bytes or 8 exbibytes is set, which allows for practically unlimited file sizes. |
-| `FITZREST_MEMORY_BUFFER_SIZE` | `65536` | Maximum number of bytes stored in memory when uploading files. If the file size is exceeding this number, then the remaining bytes are dumped onto the filesystem. |
+| `FITZREST_TEMP_DIR` | _empty_ | Path to directory, where applications's temporary _output_ files are managed. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, operating system's default temporary directory is used. Please note that the application always writes _input_ multipart data to the OS' temporary directory, regardless of the `FITZREST_TEMP_DIR` value, unless `FITZREST_MEMORY_BUFFER_SIZE` is negative. This limitation is inflicted by the `mime/multipart` Go API and cannot be feasibly altered (yet). |
+| `FITZREST_MAX_REQUEST_SIZE` | `-1` | Maximum size of a multipart request in bytes, which can be processed by the application. Note that the request size amounts to the entire HTTP request body, including multipart boundary delimiters, content disposition headers, line breaks and, indeed, the actual payload. Decent clients which send the `Content-Length` header also enjoy fail-fast behavior if that value exceeds the provided maximum. Either way, the application counts bytes during upload and returns `413 Request Entity Too Large` as soon as the limit is exceeded. By default no request size limit is set. |
+| `FITZREST_MEMORY_BUFFER_SIZE` | `10485760` | Number of bytes stored in memory when uploading multipart data. If the payload size is exceeding this number, then the remaining bytes are dumped onto the filesystem. Accordingly, the size of `0` prompts the application to always write all bytes to a temporary file, whereas any negative value such as `-1` will prevent the application from hitting the filesystem and retain the whole request payload in memory. Keep in mind that Go `mime/multipart` always adds 10 MiB on top of this value for the "non-file parts", i.e. boundaries etc., hence the actual minimum is 10 MiB plus 1 byte. The default value is therefore effectively 20 MiB. |
 | `FITZREST_ENABLE_PROMETHEUS` | `false` | Expose application metrics via [Prometheus](https://prometheus.io) endpoint `/metrics`. |
 | `FITZREST_ENABLE_SHUTDOWN_ENDPOINT` | `false` | Enable shutdown endpoint under `/shutdown`. A single POST request with arbitrary payload to this endpoint will cause the application to shutdown gracefully. |
 | `FITZREST_SHUTDOWN_TIMEOUT_SECONDS` | `0` | Specifies amount of seconds to wait before ongoing requests are forcefully cancelled in order to perform a graceful shutdown. A zero value lets the application wait indefinetely for all requests to complete. |
@@ -60,6 +60,16 @@ The application supports configuration via environment variables or a `.env` fil
 | `serialized` | Standard processing mode. First, image output is written to a local temporary file. Contents of the file are then transferred as part of the response. The process is repeated for every following page requested. This allows for a single temporary file to be reused, hence minimizing required free disk space. |
 | `interleaved` | Slightly enhanced version of the serialized mode. Two temporary files are created, with two goroutines writing images and transferring the contents interchangeably. While the first goroutine is encoding the document page, the second one is busy with serving the image of the previous page. This helps to increase throughput on such systems where the network speed is slower or merely faster than the encoding performance. This comes at a cost of two temporary files needes to be present on disk during processing. If network speed clearly dominates over encoding, then the advantage is insignificant. |
 | `inmemory` | Processing is done completely in memory, hence no temporary files are created. May be susceptible to DoS attacks, if the client issues too many requests while artificially cutting down the network throughput, so that many files remain in memory at the same point in time. |
+
+#### Pure In Memory Configuration
+In some deployments such as AWS one may want to avoid hitting the filesystem with temporary files. This is possible with the following environment variables set:
+
+* `FITZREST_MEMORY_BUFFER_SIZE=-1`
+* `FITZREST_PROCESSING_MODE=inmemory`
+
+Please also consider setting a reasonable request payload size limit to mitigate excessive memory usage:
+
+* `FITZREST_MAX_REQUEST_SIZE=134217728` (128 MiB)
 
 ### Parameters
 | parameter | mandatory | value |

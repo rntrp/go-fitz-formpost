@@ -7,7 +7,7 @@ type values struct {
 	FITZREST_ENV_DIR                  string
 	FITZREST_TCP_ADDRESS              string
 	FITZREST_TEMP_DIR                 string
-	FITZREST_MAX_FILE_SIZE            int64
+	FITZREST_MAX_REQUEST_SIZE         int64
 	FITZREST_MEMORY_BUFFER_SIZE       int64
 	FITZREST_ENABLE_PROMETHEUS        bool
 	FITZREST_ENABLE_SHUTDOWN_ENDPOINT bool
@@ -33,8 +33,8 @@ func GetTempDir() string {
 	return v.FITZREST_TEMP_DIR
 }
 
-func GetMaxFileSize() int64 {
-	return v.FITZREST_MAX_FILE_SIZE
+func GetMaxRequestSize() int64 {
+	return v.FITZREST_MAX_REQUEST_SIZE
 }
 
 func GetMemoryBufferSize() int64 {
