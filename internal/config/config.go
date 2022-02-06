@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"path/filepath"
@@ -25,6 +26,11 @@ func Load() {
 	tryLoad(v.FITZREST_ENV_DIR, ".env."+v.FITZREST_ENV)
 	tryLoad(v.FITZREST_ENV_DIR, ".env")
 	loadNonSecrets()
+	if j, err := json.MarshalIndent(&v, "", "  "); err == nil {
+		log.Println("Environment: " + string(j))
+	} else {
+		log.Panicln(err)
+	}
 }
 
 func tryLoad(path, file string) {
