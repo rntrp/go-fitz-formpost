@@ -39,7 +39,7 @@ func interleave(src []byte, dst io.Writer, params *Params) error {
 	return nil
 }
 
-func work(send chan error, cancel *int32, src []byte, duo []string, params *Params) {
+func work(send chan error, cancel *int32, src []byte, duo [2]string, params *Params) {
 	defer close(send)
 	bkg := background(params.Width, params.Height, params.Resize)
 	from := params.FirstPage
@@ -52,20 +52,23 @@ func work(send chan error, cancel *int32, src []byte, duo []string, params *Para
 	}
 }
 
-func initTmpDuo() ([]string, error) {
+func initTmpDuo() ([2]string, error) {
+	var duo [2]string
 	tmp1, err := initTmp()
 	if err != nil {
-		return nil, err
+		return duo, err
 	}
 	tmp2, err := initTmp()
 	if err != nil {
 		os.Remove(tmp1)
-		return nil, err
+		return duo, err
 	}
-	return []string{tmp1, tmp2}, nil
+	duo[0] = tmp1
+	duo[1] = tmp2
+	return duo, nil
 }
 
-func removeTmpDuo(duo []string) {
+func removeTmpDuo(duo [2]string) {
 	removeTmp(duo[0])
 	removeTmp(duo[1])
 }

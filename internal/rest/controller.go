@@ -36,7 +36,7 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 	quality, errQ := coerceQuality(format, query.Get("quality"))
 	resize, errRZ := coerceResize(query.Get("resize"))
 	resample, errRF := coerceResample(query.Get("resample"))
-	for _, err := range []error{errW, errH, errP, errF, errO, errQ, errRZ, errRF} {
+	for _, err := range [...]error{errW, errH, errP, errF, errO, errQ, errRZ, errRF} {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
