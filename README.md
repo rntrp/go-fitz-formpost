@@ -74,8 +74,8 @@ Please also consider setting a reasonable request payload size limit to mitigate
 ### Parameters
 | parameter | mandatory | value |
 |---|:---:|---|
-| `width` | yes | Min: `1`; Max: `65536` (theoretical). |
-| `height` | yes | Min: `1`; Max: `65536` (theoretical). |
+| `width` | yes | Min: `1`; Max: `65500` (theoretical). |
+| `height` | yes | Min: `1`; Max: `65500` (theoretical). |
 | `format` | yes | `jpg`, `jpeg`, `png`, `gif`, `tif`, `tiff`, `bmp`. |
 | `pages` | no | Range `m-n` with `1-8388606` being the max theoretical range. If `n` is larger than the actual page count, an HTTP 400 is returned. Special case `pages=m`, equivalent to `pages=m-m`, indicating a single page is allowed. Using underscore for the last page is also possible, e.g. `pages=1-_` for all pages of the document. Default is the first page. |
 | `archive` | yes/no | If a page range `m-n` is specified with `m`≠`n`, then providing an archive format is mandatory. `zip` and `tar` are possible values for a ZIP archive and a Tarball respectively. |
