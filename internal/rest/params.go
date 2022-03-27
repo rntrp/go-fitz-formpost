@@ -83,8 +83,7 @@ func coercePages(dim string) (int, int, error) {
 	end, err := parseInt(MinPage, MaxPage, DefaultPage, s[1], pageErrFormat)
 	if err != nil {
 		return DefaultPage, DefaultPage, err
-	}
-	if end < start {
+	} else if end < start {
 		pageRangeErrFormat := "Invalid page range [%d;%d]"
 		return start, end, errors.New(fmt.Sprintf(pageRangeErrFormat, start, end))
 	}
@@ -105,14 +104,13 @@ func coerceQuality(format imaging.Format, quality string) (int, error) {
 }
 
 func parseInt(min, max, def int, num, errFormat string) (int, error) {
-	if num == "" {
+	if len(num) == 0 {
 		return def, nil
 	}
 	n, err := strconv.Atoi(num)
 	if err != nil {
 		return n, err
-	}
-	if min > n || n > max {
+	} else if min > n || n > max {
 		return n, errors.New(fmt.Sprintf(errFormat, min, max, n))
 	}
 	return n, nil
