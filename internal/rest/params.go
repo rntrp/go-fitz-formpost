@@ -14,14 +14,31 @@ import (
 // https://stackoverflow.com/q/17279712
 const MinValidFileSize = 64
 
+// Theoretical max dimensions according to its respective specs:
+//
+// BMP (uint32 in go/x/image/bmp): 4,294,967,295
+//
+// GIF: 65,535
+//
+// JPEG: 65,535 (65,500 for the libjpeg-turbo based software)
+//
+// PNG: 4,294,967,295
+//
+// TIFF (uint32 in go/x/image/tiff): 4,294,967,295
+//
+// libjpeg-turbo max of 65,500 pixels appears to be a good limit for the other image
+// formats, since all known image viewers are getting problems with image dimensions
+// higher than this value, or even at values far smaller than this.
+const MaxImageDim = 65_500
+
 func coerceWidth(dim string) (int, error) {
 	errFormat := "Supported width range is [%d;%d], got %d"
-	return parseInt(1, 65_536, 256, dim, errFormat)
+	return parseInt(1, MaxImageDim, 256, dim, errFormat)
 }
 
 func coerceHeight(dim string) (int, error) {
 	errFormat := "Supported height range is [%d;%d], got %d"
-	return parseInt(1, 65_536, 256, dim, errFormat)
+	return parseInt(1, MaxImageDim, 256, dim, errFormat)
 }
 
 // First page index
