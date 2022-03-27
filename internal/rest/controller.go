@@ -2,11 +2,9 @@ package rest
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
-	"github.com/rntrp/go-fitz-rest-example/internal/config"
 	"github.com/rntrp/go-fitz-rest-example/internal/fitzimg"
 )
 
@@ -16,10 +14,7 @@ func NumPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	numPage, err := fitzimg.NumPage(input)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError),
-			http.StatusInternalServerError)
+	if handleError(w, err) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -51,10 +46,7 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	numPage, err := fitzimg.NumPage(input)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError),
-			http.StatusInternalServerError)
+	if handleError(w, err) {
 		return
 	} else if pageEnd == LastPage {
 		pageEnd = numPage
@@ -80,38 +72,4 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 	if err := fitzimg.Scale(input, w, params); err != nil {
 		log.Println(err)
 	}
-}
-
-func handleFileUpload(w http.ResponseWriter, r *http.Request) []byte {
-	maxReqSize := config.GetMaxRequestSize()
-	if maxReqSize >= 0 {
-		clen, err := coerceContentLength(r.Header.Get("Content-Length"))
-		if err == nil && clen > maxReqSize {
-			http.Error(w, "http: Content-Length too large",
-				http.StatusRequestEntityTooLarge)
-			return nil
-		}
-		r.Body = http.MaxBytesReader(w, r.Body, maxReqSize)
-	}
-	memBufSize := coerceMemoryBufferSize(config.GetMemoryBufferSize())
-	if err := r.ParseMultipartForm(memBufSize); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return nil
-	} else if r.MultipartForm != nil {
-		defer r.MultipartForm.RemoveAll()
-	}
-	f, _, err := r.FormFile("pdf")
-	if err != nil {
-		http.Error(w, "File 'pdf' is missing", http.StatusBadRequest)
-		return nil
-	}
-	defer f.Close()
-	input, err := ioutil.ReadAll(f)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError),
-			http.StatusInternalServerError)
-		return nil
-	}
-	return input
 }

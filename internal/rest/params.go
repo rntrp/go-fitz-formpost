@@ -11,6 +11,9 @@ import (
 	"github.com/rntrp/go-fitz-rest-example/internal/fitzimg"
 )
 
+// https://stackoverflow.com/q/17279712
+const MinValidFileSize = 64
+
 func coerceWidth(dim string) (int, error) {
 	errFormat := "Supported width range is [%d;%d], got %d"
 	return parseInt(1, 65_536, 256, dim, errFormat)

@@ -1,11 +1,17 @@
 package fitzimg
 
 import (
+	"errors"
 	"io"
 
 	"github.com/gen2brain/go-fitz"
 	"github.com/rntrp/go-fitz-rest-example/internal/config"
 )
+
+func IsErrorFormatIssue(err error) bool {
+	return errors.Is(err, fitz.ErrOpenDocument) ||
+		errors.Is(err, fitz.ErrNeedsPassword)
+}
 
 func NumPage(src []byte) (int, error) {
 	doc, err := fitz.NewFromMemory(src)
