@@ -36,7 +36,7 @@ Send a `multipart/form-data` request with a single file named `pdf` to the `/sca
 $ curl -F pdf=@/path/to/in.pdf -o /path/to/out.png http://localhost:8080/scale?width=200&height=200&format=png
 ```
 
-Alternatively, there is also `test.html` with HTML `form` and `input`. While experimenting, just edit the `form action` URL.
+Alternatively, there is also an endpoint serving basic HTML form upload page. It is available under http://localhost:8080 or http://localhost:8080/index.html.
 
 ### Environment Variables
 The application supports configuration via environment variables or a `.env` file. Environment variables have higher priority.

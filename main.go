@@ -42,6 +42,8 @@ func start() error {
 func server(sig chan os.Signal) *http.Server {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Get("/", rest.Index)
+	r.Get("/index.html", rest.Index)
 	r.Get("/live", rest.Live)
 	r.Post("/pages", rest.NumPage)
 	r.Post("/scale", rest.Scale)
