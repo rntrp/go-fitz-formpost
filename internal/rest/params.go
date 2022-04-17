@@ -156,6 +156,12 @@ func coerceResize(resize string) (fitzimg.Resize, error) {
 		return fitzimg.FitBlack, nil
 	case "fit-white":
 		return fitzimg.FitWhite, nil
+	case "fit-upscale":
+		return fitzimg.FitUpscale, nil
+	case "fit-upscale-black":
+		return fitzimg.FitUpscaleBlack, nil
+	case "fit-upscale-white":
+		return fitzimg.FitUpscaleWhite, nil
 	case "fill":
 		return fitzimg.Fill, nil
 	case "fill-top-left":

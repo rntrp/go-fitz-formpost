@@ -20,6 +20,9 @@ const (
 	Fit Resize = iota
 	FitBlack
 	FitWhite
+	FitUpscale
+	FitUpscaleBlack
+	FitUpscaleWhite
 	Fill
 	FillTopLeft
 	FillTop

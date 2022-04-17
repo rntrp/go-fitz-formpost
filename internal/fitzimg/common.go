@@ -39,9 +39,9 @@ func removeTmp(tmp string) {
 func background(width, height int, resize Resize) *image.NRGBA {
 	var color *image.Uniform
 	switch resize {
-	case FitBlack:
+	case FitBlack, FitUpscaleBlack:
 		color = image.Black
-	case FitWhite:
+	case FitWhite, FitUpscaleWhite:
 		color = image.White
 	default:
 		return nil
@@ -120,8 +120,13 @@ func quality(format imaging.Format, value int) []imaging.EncodeOption {
 
 func resize(img image.Image, bkg draw.Image, params *Params) *image.NRGBA {
 	switch params.Resize {
+	case FitUpscale:
+		return fitUpscale(img, params.Width, params.Height, params.Resample)
 	case FitBlack, FitWhite:
 		resized := imaging.Fit(img, params.Width, params.Height, params.Resample)
+		return imaging.OverlayCenter(bkg, resized, 1.0)
+	case FitUpscaleBlack, FitUpscaleWhite:
+		resized := fitUpscale(img, params.Width, params.Height, params.Resample)
 		return imaging.OverlayCenter(bkg, resized, 1.0)
 	case FillTopLeft, FillTop, FillTopRight:
 	case FillLeft, Fill, FillRight:
@@ -132,4 +137,13 @@ func resize(img image.Image, bkg draw.Image, params *Params) *image.NRGBA {
 		return imaging.Resize(img, params.Width, params.Height, params.Resample)
 	}
 	return imaging.Fit(img, params.Width, params.Height, params.Resample)
+}
+
+func fitUpscale(img image.Image, w, h int, r imaging.ResampleFilter) *image.NRGBA {
+	b := img.Bounds()
+	if b.Dx() < b.Dy() {
+		// portrait images are bound by height
+		return imaging.Resize(img, 0, h, r)
+	}
+	return imaging.Resize(img, w, 0, r)
 }

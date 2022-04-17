@@ -86,9 +86,12 @@ Please also consider setting a reasonable request payload size limit to mitigate
 #### Image Resizing Modes
 | value | description |
 |---|---|
-| `fit` | Image is scaled within the specified width-height box ("fit") preserving the aspect ratio of the image. Scaled images with an aspect ratio differing from the specified dimensions have therefore either less width or height. **This is the default mode.** |
-| `fit-black` | Same as `fit`, but the left out pixels are filled with black color. Such images have horizontal or black bars on the opposite sides of the image, a practice also known as "letterboxing". |
+| `fit` | Image is scaled within the specified width-height box ("fit") preserving the aspect ratio of the image. Scaled images with an aspect ratio differing from the specified dimensions have therefore either less width or height. **Note:** if the source image is smaller than the targeted bounding box, the resulting image will retain its source dimensions. Use `fit-upscale` in case the source image should be upscaled. **`fit` is the default mode.** |
+| `fit-black` | Same as `fit`, but the left out pixels are filled with black color. Such images have horizontal or vertical black bars on the opposite sides of the image, a practice also known as "letterboxing" or "pillarboxing", respectively. **Note:** if the source image is smaller than the targeted bounding box, the resulting image will be surrounded by black bars, i.e. "windowboxed". Use `fit-upscale-black` if the source image should be upscaled. |
 | `fit-white` | Same as `fit-black`, but the bars are now white. |
+| `fit-upscale` | Same as `fit`, but upscales the source image so either image width or height fits the targeted bounding box. |
+| `fit-upscale-black` | Same as `fit-black`, but upscales the source image avoiding windowboxing. |
+| `fit-upscale-white` | Same as `fit-upscale-black`, but the bars are now white. |
 | `fill` | Image is scaled to fill the entire width-height box preserving the aspect ratio of the image. If the image has a different aspect ratio, than specified by the target dimensions, then the image is cropped around the center of the image from both sides. Taller images are equally cropped at the top and bottom, accordingly wider ones are cropped left and right. |
 | `fill-top-left` | Same as `fill`, but taller images are cropped from the top, hence the outsized bottom part is left out. Wider images are cropped from the left. This option may come in handy when processing both portrait and landscape oriented documents. |
 | `fill-top` | Same as `fill`, but taller images are cropped from the top, hence the bottom part is left out. Wider images are still cropped at the center. |
