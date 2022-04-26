@@ -128,15 +128,16 @@ func resize(img image.Image, bkg draw.Image, params *Params) *image.NRGBA {
 	case FitUpscaleBlack, FitUpscaleWhite:
 		resized := fitUpscale(img, params.Width, params.Height, params.Resample)
 		return imaging.OverlayCenter(bkg, resized, 1.0)
-	case FillTopLeft, FillTop, FillTopRight:
-	case FillLeft, Fill, FillRight:
-	case FillBottomLeft, FillBottom, FillBottomRight:
+	case FillTopLeft, FillTop, FillTopRight,
+		FillLeft, Fill, FillRight,
+		FillBottomLeft, FillBottom, FillBottomRight:
 		anchor := resizeFillMap[params.Resize]
 		return imaging.Fill(img, params.Width, params.Height, anchor, params.Resample)
 	case Stretch:
 		return imaging.Resize(img, params.Width, params.Height, params.Resample)
+	default:
+		return imaging.Fit(img, params.Width, params.Height, params.Resample)
 	}
-	return imaging.Fit(img, params.Width, params.Height, params.Resample)
 }
 
 func fitUpscale(img image.Image, w, h int, r imaging.ResampleFilter) *image.NRGBA {
