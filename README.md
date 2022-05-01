@@ -43,16 +43,16 @@ The application supports configuration via environment variables or a `.env` fil
 
 | variable | default | description |
 |---|---|---|
-| `FITZREST_ENV` | `development` | Currently, this setting only affects the [`.env` file precedence](https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use), no actual distinction between execution environments is made. Possible values are `development`, `test` and `production`. |
-| `FITZREST_ENV_DIR` | _empty_ | Path to directory containing the `.env` file. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, `.env` file is read from the application folder. |
-| `FITZREST_TCP_ADDRESS` | `:8080` | Application TCP address as described by the Golang's `http.Server.Addr` field, most prominently in form of `host:port`. See also [`net` package docs](https://pkg.go.dev/net). |
-| `FITZREST_TEMP_DIR` | _empty_ | Path to directory, where applications's temporary _output_ files are managed. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, operating system's default temporary directory is used. Please note that the application always writes _input_ multipart data to the OS' temporary directory, regardless of the `FITZREST_TEMP_DIR` value, unless `FITZREST_MEMORY_BUFFER_SIZE` is negative. This limitation is inflicted by the `mime/multipart` Go API and cannot be feasibly altered (yet). |
-| `FITZREST_MAX_REQUEST_SIZE` | `-1` | Maximum size of a multipart request in bytes, which can be processed by the application. Note that the request size amounts to the entire HTTP request body, including multipart boundary delimiters, content disposition headers, line breaks and, indeed, the actual payload. Decent clients which send the `Content-Length` header also enjoy fail-fast behavior if that value exceeds the provided maximum. Either way, the application counts bytes during upload and returns `413 Request Entity Too Large` as soon as the limit is exceeded. By default no request size limit is set. |
-| `FITZREST_MEMORY_BUFFER_SIZE` | `10485760` | Number of bytes stored in memory when uploading multipart data. If the payload size is exceeding this number, then the remaining bytes are dumped onto the filesystem. Accordingly, the size of `0` prompts the application to always write all bytes to a temporary file, whereas any negative value such as `-1` will prevent the application from hitting the filesystem and retain the whole request payload in memory. Keep in mind that Go `mime/multipart` always adds 10 MiB on top of this value for the "non-file parts", i.e. boundaries etc., hence the actual minimum is 10 MiB plus 1 byte. The default value is therefore effectively 20 MiB. |
-| `FITZREST_ENABLE_PROMETHEUS` | `false` | Expose application metrics via [Prometheus](https://prometheus.io) endpoint `/metrics`. |
-| `FITZREST_ENABLE_SHUTDOWN_ENDPOINT` | `false` | Enable shutdown endpoint under `/shutdown`. A single POST request with arbitrary payload to this endpoint will cause the application to shutdown gracefully. |
-| `FITZREST_SHUTDOWN_TIMEOUT_SECONDS` | `0` | Specifies amount of seconds to wait before ongoing requests are forcefully cancelled in order to perform a graceful shutdown. A zero value lets the application wait indefinetely for all requests to complete. |
-| `FITZREST_PROCESSING_MODE` | `serialized` | Choose between `serialized`, `interleaved` and `inmemory` processing modes. |
+| `FITZ_FORMPOST_ENV` | `development` | Currently, this setting only affects the [`.env` file precedence](https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use), no actual distinction between execution environments is made. Possible values are `development`, `test` and `production`. |
+| `FITZ_FORMPOST_ENV_DIR` | _empty_ | Path to directory containing the `.env` file. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, `.env` file is read from the application folder. |
+| `FITZ_FORMPOST_TCP_ADDRESS` | `:8080` | Application TCP address as described by the Golang's `http.Server.Addr` field, most prominently in form of `host:port`. See also [`net` package docs](https://pkg.go.dev/net). |
+| `FITZ_FORMPOST_TEMP_DIR` | _empty_ | Path to directory, where applications's temporary _output_ files are managed. Absolute paths or paths relative to the application folder are possible. If the variable is left _empty_, operating system's default temporary directory is used. Please note that the application always writes _input_ multipart data to the OS' temporary directory, regardless of the `FITZ_FORMPOST_TEMP_DIR` value, unless `FITZ_FORMPOST_MEMORY_BUFFER_SIZE` is negative. This limitation is inflicted by the `mime/multipart` Go API and cannot be feasibly altered (yet). |
+| `FITZ_FORMPOST_MAX_REQUEST_SIZE` | `-1` | Maximum size of a multipart request in bytes, which can be processed by the application. Note that the request size amounts to the entire HTTP request body, including multipart boundary delimiters, content disposition headers, line breaks and, indeed, the actual payload. Decent clients which send the `Content-Length` header also enjoy fail-fast behavior if that value exceeds the provided maximum. Either way, the application counts bytes during upload and returns `413 Request Entity Too Large` as soon as the limit is exceeded. By default no request size limit is set. |
+| `FITZ_FORMPOST_MEMORY_BUFFER_SIZE` | `10485760` | Number of bytes stored in memory when uploading multipart data. If the payload size is exceeding this number, then the remaining bytes are dumped onto the filesystem. Accordingly, the size of `0` prompts the application to always write all bytes to a temporary file, whereas any negative value such as `-1` will prevent the application from hitting the filesystem and retain the whole request payload in memory. Keep in mind that Go `mime/multipart` always adds 10 MiB on top of this value for the "non-file parts", i.e. boundaries etc., hence the actual minimum is 10 MiB plus 1 byte. The default value is therefore effectively 20 MiB. |
+| `FITZ_FORMPOST_ENABLE_PROMETHEUS` | `false` | Expose application metrics via [Prometheus](https://prometheus.io) endpoint `/metrics`. |
+| `FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT` | `false` | Enable shutdown endpoint under `/shutdown`. A single POST request with arbitrary payload to this endpoint will cause the application to shutdown gracefully. |
+| `FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS` | `0` | Specifies amount of seconds to wait before ongoing requests are forcefully cancelled in order to perform a graceful shutdown. A zero value lets the application wait indefinetely for all requests to complete. |
+| `FITZ_FORMPOST_PROCESSING_MODE` | `serialized` | Choose between `serialized`, `interleaved` and `inmemory` processing modes. |
 
 #### Processing Modes
 | value | description |
@@ -64,12 +64,12 @@ The application supports configuration via environment variables or a `.env` fil
 #### Pure In Memory Configuration
 In some deployments such as AWS one may want to avoid hitting the filesystem with temporary files. This is possible with the following environment variables set:
 
-* `FITZREST_MEMORY_BUFFER_SIZE=-1`
-* `FITZREST_PROCESSING_MODE=inmemory`
+* `FITZ_FORMPOST_MEMORY_BUFFER_SIZE=-1`
+* `FITZ_FORMPOST_PROCESSING_MODE=inmemory`
 
 Please also consider setting a reasonable request payload size limit to mitigate excessive memory usage:
 
-* `FITZREST_MAX_REQUEST_SIZE=134217728` (128 MiB)
+* `FITZ_FORMPOST_MAX_REQUEST_SIZE=134217728` (128 MiB)
 
 ### Parameters
 | parameter | mandatory | value |

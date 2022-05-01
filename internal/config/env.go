@@ -3,54 +3,54 @@ package config
 import "time"
 
 type values struct {
-	FITZREST_ENV                      string
-	FITZREST_ENV_DIR                  string
-	FITZREST_TCP_ADDRESS              string
-	FITZREST_TEMP_DIR                 string
-	FITZREST_MAX_REQUEST_SIZE         int64
-	FITZREST_MEMORY_BUFFER_SIZE       int64
-	FITZREST_ENABLE_PROMETHEUS        bool
-	FITZREST_ENABLE_SHUTDOWN_ENDPOINT bool
-	FITZREST_SHUTDOWN_TIMEOUT_SECONDS time.Duration
-	FITZREST_PROCESSING_MODE          ProcessingMode
+	FITZ_FORMPOST_ENV                      string
+	FITZ_FORMPOST_ENV_DIR                  string
+	FITZ_FORMPOST_TCP_ADDRESS              string
+	FITZ_FORMPOST_TEMP_DIR                 string
+	FITZ_FORMPOST_MAX_REQUEST_SIZE         int64
+	FITZ_FORMPOST_MEMORY_BUFFER_SIZE       int64
+	FITZ_FORMPOST_ENABLE_PROMETHEUS        bool
+	FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT bool
+	FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS time.Duration
+	FITZ_FORMPOST_PROCESSING_MODE          ProcessingMode
 }
 
 var v values
 
 func GetEnv() string {
-	return v.FITZREST_ENV
+	return v.FITZ_FORMPOST_ENV
 }
 
 func GetEnvDir() string {
-	return v.FITZREST_ENV_DIR
+	return v.FITZ_FORMPOST_ENV_DIR
 }
 
 func GetTCPAddress() string {
-	return v.FITZREST_TCP_ADDRESS
+	return v.FITZ_FORMPOST_TCP_ADDRESS
 }
 
 func GetTempDir() string {
-	return v.FITZREST_TEMP_DIR
+	return v.FITZ_FORMPOST_TEMP_DIR
 }
 
 func GetMaxRequestSize() int64 {
-	return v.FITZREST_MAX_REQUEST_SIZE
+	return v.FITZ_FORMPOST_MAX_REQUEST_SIZE
 }
 
 func GetMemoryBufferSize() int64 {
-	return v.FITZREST_MEMORY_BUFFER_SIZE
+	return v.FITZ_FORMPOST_MEMORY_BUFFER_SIZE
 }
 
 func IsEnablePrometheus() bool {
-	return v.FITZREST_ENABLE_PROMETHEUS
+	return v.FITZ_FORMPOST_ENABLE_PROMETHEUS
 }
 
 func IsEnableShutdown() bool {
-	return v.FITZREST_ENABLE_SHUTDOWN_ENDPOINT
+	return v.FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT
 }
 
 func GetShutdownTimeout() time.Duration {
-	return v.FITZREST_SHUTDOWN_TIMEOUT_SECONDS
+	return v.FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS
 }
 
 type ProcessingMode int
@@ -68,5 +68,5 @@ var processingModeStrings = map[string]ProcessingMode{
 }
 
 func GetProcessingMode() ProcessingMode {
-	return v.FITZREST_PROCESSING_MODE
+	return v.FITZ_FORMPOST_PROCESSING_MODE
 }

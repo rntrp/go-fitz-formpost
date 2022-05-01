@@ -14,17 +14,17 @@ import (
 
 func Load() {
 	// https://github.com/joho/godotenv#precedence--conventions
-	v.FITZREST_ENV = os.Getenv("FITZREST_ENV")
-	if len(v.FITZREST_ENV) == 0 {
-		v.FITZREST_ENV = "development"
+	v.FITZ_FORMPOST_ENV = os.Getenv("FITZ_FORMPOST_ENV")
+	if len(v.FITZ_FORMPOST_ENV) == 0 {
+		v.FITZ_FORMPOST_ENV = "development"
 	}
-	v.FITZREST_ENV_DIR = os.Getenv("FITZREST_ENV_DIR")
-	tryLoad(v.FITZREST_ENV_DIR, ".env."+v.FITZREST_ENV+".local")
-	if v.FITZREST_ENV != "test" {
-		tryLoad(v.FITZREST_ENV_DIR, ".env.local")
+	v.FITZ_FORMPOST_ENV_DIR = os.Getenv("FITZ_FORMPOST_ENV_DIR")
+	tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env."+v.FITZ_FORMPOST_ENV+".local")
+	if v.FITZ_FORMPOST_ENV != "test" {
+		tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env.local")
 	}
-	tryLoad(v.FITZREST_ENV_DIR, ".env."+v.FITZREST_ENV)
-	tryLoad(v.FITZREST_ENV_DIR, ".env")
+	tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env."+v.FITZ_FORMPOST_ENV)
+	tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env")
 	loadNonSecrets()
 	if j, err := json.MarshalIndent(&v, "", "  "); err == nil {
 		log.Println("Environment: " + string(j))
@@ -41,14 +41,14 @@ func tryLoad(path, file string) {
 }
 
 func loadNonSecrets() {
-	v.FITZREST_TCP_ADDRESS = parseString("FITZREST_TCP_ADDRESS", ":8080")
-	v.FITZREST_TEMP_DIR = parseString("FITZREST_TEMP_DIR", "")
-	v.FITZREST_MAX_REQUEST_SIZE = parseInt64("FITZREST_MAX_REQUEST_SIZE", -1)
-	v.FITZREST_MEMORY_BUFFER_SIZE = parseInt64("FITZREST_MEMORY_BUFFER_SIZE", 10<<20)
-	v.FITZREST_ENABLE_PROMETHEUS = parseBool("FITZREST_ENABLE_PROMETHEUS", false)
-	v.FITZREST_ENABLE_SHUTDOWN_ENDPOINT = parseBool("FITZREST_ENABLE_SHUTDOWN_ENDPOINT", false)
-	v.FITZREST_SHUTDOWN_TIMEOUT_SECONDS = parseDuration("FITZREST_SHUTDOWN_TIMEOUT_SECONDS", 0, time.Second)
-	v.FITZREST_PROCESSING_MODE = parseProcessingMode("FITZREST_PROCESSING_MODE", Serialized)
+	v.FITZ_FORMPOST_TCP_ADDRESS = parseString("FITZ_FORMPOST_TCP_ADDRESS", ":8080")
+	v.FITZ_FORMPOST_TEMP_DIR = parseString("FITZ_FORMPOST_TEMP_DIR", "")
+	v.FITZ_FORMPOST_MAX_REQUEST_SIZE = parseInt64("FITZ_FORMPOST_MAX_REQUEST_SIZE", -1)
+	v.FITZ_FORMPOST_MEMORY_BUFFER_SIZE = parseInt64("FITZ_FORMPOST_MEMORY_BUFFER_SIZE", 10<<20)
+	v.FITZ_FORMPOST_ENABLE_PROMETHEUS = parseBool("FITZ_FORMPOST_ENABLE_PROMETHEUS", false)
+	v.FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT = parseBool("FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT", false)
+	v.FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS = parseDuration("FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS", 0, time.Second)
+	v.FITZ_FORMPOST_PROCESSING_MODE = parseProcessingMode("FITZ_FORMPOST_PROCESSING_MODE", Serialized)
 }
 
 func parseBool(env string, def bool) bool {
