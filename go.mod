@@ -1,4 +1,4 @@
-module github.com/rntrp/go-fitz-rest-example
+module github.com/rntrp/go-fitz-formpost
 
 go 1.14
 

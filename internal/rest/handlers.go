@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rntrp/go-fitz-rest-example/internal/config"
-	"github.com/rntrp/go-fitz-rest-example/internal/fitzimg"
+	"github.com/rntrp/go-fitz-formpost/internal/config"
+	"github.com/rntrp/go-fitz-formpost/internal/fitzimg"
 )
 
 func handleError(w http.ResponseWriter, err error) bool {

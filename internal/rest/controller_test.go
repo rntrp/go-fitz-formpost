@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/rntrp/go-fitz-rest-example/internal/config"
+	"github.com/rntrp/go-fitz-formpost/internal/config"
 )
 
 func init() {

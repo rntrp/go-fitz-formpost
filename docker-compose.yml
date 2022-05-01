@@ -1,8 +1,8 @@
 version: "3.7"
 services:
   web:
-    container_name: go-fitz-rest-example
-    image: go-fitz-rest-example:latest
+    container_name: go-fitz-formpost
+    image: go-fitz-formpost:latest
     restart: "no"
     build: .
     ports:

@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/rntrp/go-fitz-rest-example/internal/config"
-	"github.com/rntrp/go-fitz-rest-example/internal/rest"
+	"github.com/rntrp/go-fitz-formpost/internal/config"
+	"github.com/rntrp/go-fitz-formpost/internal/rest"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

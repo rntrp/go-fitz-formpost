@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rntrp/go-fitz-rest-example/internal/fitzimg"
+	"github.com/rntrp/go-fitz-formpost/internal/fitzimg"
 )
 
 func NumPage(w http.ResponseWriter, r *http.Request) {

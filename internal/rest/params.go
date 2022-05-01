@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/disintegration/imaging"
-	"github.com/rntrp/go-fitz-rest-example/internal/fitzimg"
+	"github.com/rntrp/go-fitz-formpost/internal/fitzimg"
 )
 
 // https://stackoverflow.com/q/17279712

@@ -16,7 +16,7 @@ COPY internal ./internal
 RUN export CGO_LDFLAGS="-lmupdf -lm -lmupdf-third -lfreetype -ljbig2dec -lharfbuzz -ljpeg -lopenjp2 -lz" \
     && go mod download \
     && go test ./... \
-    && go build -o /go-fitz-rest
+    && go build -o /go-fitz-formpost
 
 FROM alpine:3.14
 RUN apk add --no-cache \
@@ -32,6 +32,6 @@ RUN apk add --no-cache \
         mupdf \
         openjpeg \
         zlib
-COPY --from=builder /go-fitz-rest ./
+COPY --from=builder /go-fitz-formpost ./
 EXPOSE 8080
-CMD [ "/go-fitz-rest" ]
+CMD [ "/go-fitz-formpost" ]

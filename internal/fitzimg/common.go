@@ -13,7 +13,7 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/gen2brain/go-fitz"
-	"github.com/rntrp/go-fitz-rest-example/internal/config"
+	"github.com/rntrp/go-fitz-formpost/internal/config"
 )
 
 func initTmp() (string, error) {

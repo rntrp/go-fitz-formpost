@@ -20,8 +20,8 @@ $ go run .
 
 ### With Docker
 ```bash
-$ docker build --pull --rm -t go-fitz-rest-example:latest .
-$ docker run --rm -it  -p 8080:8080/tcp go-fitz-rest-example:latest
+$ docker build --pull --rm -t go-fitz-formpost:latest .
+$ docker run --rm -it  -p 8080:8080/tcp go-fitz-formpost:latest
 ```
 
 ### With `docker-compose`
