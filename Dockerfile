@@ -20,12 +20,8 @@ RUN export CGO_LDFLAGS="-lmupdf -lm -lmupdf-third -lfreetype -ljbig2dec -lharfbu
 
 FROM alpine:3.14
 RUN apk add --no-cache \
-        fontconfig \
-        ghostscript-fonts \
-        msttcorefonts-installer \
-    && update-ms-fonts && fc-cache -f \
-    && apk add --no-cache \
         freetype \
+        ghostscript-fonts \
         harfbuzz \
         jbig2dec \
         jpeg \
