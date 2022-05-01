@@ -22,7 +22,7 @@ func NumPage(src []byte) (int, error) {
 	return doc.NumPage(), nil
 }
 
-func Scale(src []byte, dst io.Writer, params *Params) error {
+func Convert(src []byte, dst io.Writer, params *Params) error {
 	switch config.GetProcessingMode() {
 	case config.Interleaved:
 		return interleave(src, dst, params)

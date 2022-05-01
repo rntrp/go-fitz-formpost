@@ -46,7 +46,7 @@ func server(sig chan os.Signal) *http.Server {
 	r.Get("/index.html", rest.Index)
 	r.Get("/live", rest.Live)
 	r.Post("/pages", rest.NumPage)
-	r.Post("/scale", rest.Scale)
+	r.Post("/scale", rest.Convert)
 	if config.IsEnablePrometheus() {
 		r.Handle("/metrics", promhttp.Handler())
 	}

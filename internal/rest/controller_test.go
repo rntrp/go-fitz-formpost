@@ -41,7 +41,7 @@ func TestScale(t *testing.T) {
 	req := httptest.NewRequest("POST", "/scale?width=2&height=2&page=1&format=png", bytes.NewReader(body))
 	req.Header.Add("Content-Type", "multipart/form-data; boundary=\"boundary\"")
 
-	Scale(rec, req)
+	Convert(rec, req)
 
 	if rec.Code != 200 {
 		t.Errorf("rec.Code = %v; want 200", rec.Code)
@@ -66,7 +66,7 @@ func TestArchiveScale(t *testing.T) {
 	req := httptest.NewRequest("POST", "/scale?width=2&height=2&page=1&format=png", bytes.NewReader(body))
 	req.Header.Add("Content-Type", "multipart/form-data; boundary=\"boundary\"")
 
-	Scale(rec, req)
+	Convert(rec, req)
 
 	if rec.Code != 200 {
 		t.Errorf("rec.Code = %v; want 200", rec.Code)

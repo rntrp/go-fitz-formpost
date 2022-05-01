@@ -21,7 +21,7 @@ func NumPage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%d", numPage)
 }
 
-func Scale(w http.ResponseWriter, r *http.Request) {
+func Convert(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	width, errW := coerceWidth(query.Get("width"))
 	height, errH := coerceHeight(query.Get("height"))
@@ -69,7 +69,7 @@ func Scale(w http.ResponseWriter, r *http.Request) {
 	ext, mime := getOutputFileMeta(archive, format)
 	w.Header().Set("Content-Disposition", "attachment; filename=result"+ext)
 	w.Header().Set("Content-Type", mime)
-	if err := fitzimg.Scale(input, w, params); err != nil {
+	if err := fitzimg.Convert(input, w, params); err != nil {
 		log.Println(err)
 	}
 }
