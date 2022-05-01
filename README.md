@@ -2,7 +2,7 @@
 A microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go wrapper for the [MuPDF](https://mupdf.com/) Fitz library. Accepts PDF documents via `multipart/form-data` POST requests, delivers images in response.
 
 ## Build & Launch
-Besides Go 1.14, MuPDF needs to be installed separately.
+Besides Go 1.16, MuPDF needs to be installed separately.
 
 ### Locally
 Follow [build instructions](https://github.com/gen2brain/go-fitz) for `go-fitz` with MuPDF. When linking against shared libraries, one may want to set the `CGO_LDFLAGS` environment variable, e.g.:
