@@ -1,8 +1,8 @@
-# Go PDF to Image Microservice Example with go-fitz
-Example implementation of a REST microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go wrapper for the [MuPDF](https://mupdf.com/) fitz library.
+# PDF to Image Formpost Microservice
+A microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go wrapper for the [MuPDF](https://mupdf.com/) Fitz library. Accepts PDF documents via `multipart/form-data` POST requests, delivers images in response.
 
 ## Build & Launch
-Besides Go 1.16, MuPDF needs to be installed separately.
+Besides Go 1.14, MuPDF needs to be installed separately.
 
 ### Locally
 Follow [build instructions](https://github.com/gen2brain/go-fitz) for `go-fitz` with MuPDF. When linking against shared libraries, one may want to set the `CGO_LDFLAGS` environment variable, e.g.:
@@ -112,7 +112,7 @@ The following resampling algorithms are provided by the Golang [Imaging library]
 | `nearest` | Nearest-neighbor interpolation |
 | `linear` | Linear interpolation |
 | `hermite` | Hermite cubic interpolation, i.e. BC-spline with B=0 and C=0 |
-| `mitchell` | Mitchell-Netravali cubic interpolation, i.e. BC-spline with [ImageMagick](https://imagemagick.org) parameters B=⅓ and C=⅓ |
+| `mitchell` | Mitchell–Netravali cubic interpolation, i.e. BC-spline with [ImageMagick](https://imagemagick.org) parameters B=⅓ and C=⅓ |
 | `catmull` | Catmull–Rom spline with B=0 and C=½, also used in [GIMP](https://gimp.org) |
 | `bspline` | B-spline, i.e. cubic interpolation with [Paint.NET](https://www.getpaint.net) parameters B=1 and C=0 |
 | `bartlett` | Bartlett window sinc resampling (3 lobes) |
