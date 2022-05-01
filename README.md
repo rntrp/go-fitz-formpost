@@ -38,6 +38,17 @@ $ curl -F pdf=@/path/to/in.pdf -o /path/to/out.png http://localhost:8080/scale?w
 
 Alternatively, there is also an endpoint serving basic HTML form upload page. It is available under http://localhost:8080 or http://localhost:8080/index.html.
 
+### Endpoint Overview
+| path | method | description |
+|---|---|---|
+| `/` | `GET` | Returns a simple HTML page with form uploads for testing `/convert` and `/pages` endpoints. |
+| `/index.html` | `GET` | Same as `/`. |
+| `/live` | `GET` | Liveness probe endpoint. Returns HTTP 200 while the application is running. |
+| `/metrics` | `GET` | Returns application metrics in Prometheus text-based format collected by the [Prometheus Go client library](https://github.com/prometheus/client_golang). The endpoint is disabled by default; enabled with `FITZ_FORMPOST_ENABLE_PROMETHEUS=true` (see [Environment Variables](#environment-variables) below). |
+| `/convert` | `POST` | Pivotal endpoint within the whole application. Accepts a single document per `multipart/form-data` request. Converts the document to the requested image format. Target dimensions are specified as part of the URL query string. See [Parameters](#parameters) below for further details. |
+| `/pages` | `POST` | Accepts a single document per `multipart/form-data` request. Returns page count of the document as `text/plain; charset=utf-8`. |
+| `/shutdown` | `POST` | Initiates graceful shutdown of the application when triggered by a POST request with an arbitrary payload. Returns HTTP 204 after the shutdown process has been started. The endpoint is disabled by default; enabled with `FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT=true` (see [Environment Variables](#environment-variables) below). |
+
 ### Environment Variables
 The application supports configuration via environment variables or a `.env` file. Environment variables have higher priority.
 
