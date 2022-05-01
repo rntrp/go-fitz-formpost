@@ -48,7 +48,7 @@ var html = []byte(`<!DOCTYPE html>
 						var v = document.getElementById(id).value;
 						return v && v !== "" ? id + "=" + v : null;
 					}).filter(function(v) { return v; }).join("&");
-				var url = "scale?" + p;
+				var url = "convert?" + p;
 				document.getElementById("url").textContent = url;
 				document.getElementById("form1").action = url;
 			}
@@ -60,7 +60,7 @@ var html = []byte(`<!DOCTYPE html>
 	<body onload="update()">
 		<div class="main">
 			<h1>Convert PDF Document</h1>
-			<form id="form1" action="scale" method="POST" enctype="multipart/form-data">
+			<form id="form1" action="#" method="POST" enctype="multipart/form-data">
 				<p>
 					<label for="convert">Document*:</label>
 					<input id="convert" type="file" name="pdf" accept="application/pdf">
