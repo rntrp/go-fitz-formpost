@@ -54,3 +54,11 @@ type Params struct {
 	Resize              Resize
 	Resample            imaging.ResampleFilter
 }
+
+var filenameExtensions = map[imaging.Format]string{
+	imaging.BMP:  "bmp",
+	imaging.GIF:  "gif",
+	imaging.JPEG: "jpg",
+	imaging.PNG:  "png",
+	imaging.TIFF: "tif",
+}

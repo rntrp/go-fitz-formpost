@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/disintegration/imaging"
 	"github.com/gen2brain/go-fitz"
@@ -60,7 +59,7 @@ func process(src []byte, bkg draw.Image, dst string, out interface{}, page int, 
 }
 
 func name(page int, format imaging.Format) string {
-	return fmt.Sprintf("img%07d.%s", page+1, strings.ToLower(format.String()))
+	return fmt.Sprintf("img%07d.%s", page+1, filenameExtensions[format])
 }
 
 func dump(src []byte, bkg draw.Image, dst string, page int, params *Params) error {
