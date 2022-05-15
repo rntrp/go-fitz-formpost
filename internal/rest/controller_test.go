@@ -31,14 +31,14 @@ const pdf3PagesB64 = "JVBERi0xLjAKJeLjz9MKMiAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUG
 	"KSBdIC9Sb290IDIgMCBSID4+IA0Kc3RhcnR4cmVmDQozNTkNCiUlRU9GDQo=+PmVuZG9iaiAzIDA" +
 	"gb2JqPDwvTWVkaWFCb3hbMCAwIDMgM10+PmVuZG9iagp0cmFpbGVyPDwvUm9vdCAxIDAgUj4+Cg=="
 
-func TestScale(t *testing.T) {
+func TestConvert(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	pdfBytes, _ := base64.StdEncoding.DecodeString(pdfB64)
 	body := []byte("--boundary\r\nContent-Disposition: form-data; name=\"pdf\"; filename=\"pdf\"\r\n\r\n")
 	body = append(body, pdfBytes...)
 	body = append(body, []byte("\r\n--boundary--")...)
-	req := httptest.NewRequest("POST", "/scale?width=2&height=2&page=1&format=png", bytes.NewReader(body))
+	req := httptest.NewRequest("POST", "/convert?width=2&height=2&from=1&format=png", bytes.NewReader(body))
 	req.Header.Add("Content-Type", "multipart/form-data; boundary=\"boundary\"")
 
 	Convert(rec, req)
@@ -56,14 +56,14 @@ func TestScale(t *testing.T) {
 	}
 }
 
-func TestArchiveScale(t *testing.T) {
+func TestArchiveConvert(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	pdfBytes, _ := base64.StdEncoding.DecodeString(pdf3PagesB64)
 	body := []byte("--boundary\r\nContent-Disposition: form-data; name=\"pdf\"; filename=\"pdf\"\r\n\r\n")
 	body = append(body, pdfBytes...)
 	body = append(body, []byte("\r\n--boundary--")...)
-	req := httptest.NewRequest("POST", "/scale?width=2&height=2&page=1&format=png", bytes.NewReader(body))
+	req := httptest.NewRequest("POST", "/convert?width=2&height=2&from=1&format=png", bytes.NewReader(body))
 	req.Header.Add("Content-Type", "multipart/form-data; boundary=\"boundary\"")
 
 	Convert(rec, req)

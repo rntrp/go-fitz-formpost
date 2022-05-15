@@ -43,11 +43,11 @@ var html = []byte(`<!DOCTYPE html>
 		</style>
 		<script>
 			function update() {
-				var p = ["width", "height", "format", "quality", "resize", "resample", "pages", "archive"]
+				var p = ["width", "height", "format", "quality", "resize", "resample", "from", "to", "archive"]
 					.map(function(id) {
 						var v = document.getElementById(id).value;
 						return v && v !== "" ? id + "=" + v : null;
-					}).filter(function(v) { return v; }).join("&");
+					}).filter(Boolean).join("&");
 				var url = "convert?" + p;
 				document.getElementById("url").textContent = url;
 				document.getElementById("form1").action = url;
@@ -136,11 +136,15 @@ var html = []byte(`<!DOCTYPE html>
 					</select>
 				</p>
 				<p>
-					<label for="pages">Pages<sup>2</sup>:</label>
-					<input id="pages" type="text" pattern="^(\d{0,7})(?:\-(_|\d{1,7}))?$" placeholder="1-_" onchange="update()">
+					<label for="from">First page:</label>
+					<input id="from" type="number" min="1" max="8388606" onchange="update()">
 				</p>
 				<p>
-					<label for="archive">Archive<sup>3</sup>:</label>
+					<label for="to">Last page:</label>
+					<input id="to" type="number" min="1" max="8388606" onchange="update()">
+				</p>
+				<p>
+					<label for="archive">Archive<sup>2</sup>:</label>
 					<select id="archive" onchange="update()">
 						<option>
 						<option value="zip">ZIP</option>
@@ -170,8 +174,7 @@ var html = []byte(`<!DOCTYPE html>
 			<h1>Notes</h1>
 			<p>* Mandatory field</p>
 			<p><sup>1</sup> 0-100 for JPEGs, 0-9 for PNG compression</p>
-			<p><sup>2</sup> For instance, 1 or 1-_ or 1-10</p>
-			<p><sup>3</sup> Mandatory if pages is set to multiple</p>
+			<p><sup>2</sup> Mandatory if pages is set to multiple</p>
 		</div>
 	</body>
 </html>

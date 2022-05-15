@@ -66,6 +66,16 @@ func coerceMemoryBufferSize(memoryBufferSize int64) int64 {
 	return memoryBufferSize
 }
 
+func coerceFrom(dim string) (int, error) {
+	errFormat := "Start page index range is [%d;%d], got %d"
+	return parseInt(1, MaxPage, 1, dim, errFormat)
+}
+
+func coerceTo(dim string) (int, error) {
+	errFormat := "End page index range is [%d;%d], got %d"
+	return parseInt(1, MaxPage, LastPage, dim, errFormat)
+}
+
 func coercePages(dim string) (int, int, error) {
 	if len(dim) == 0 {
 		return DefaultPage, DefaultPage, nil
@@ -114,14 +124,6 @@ func parseInt(min, max, def int, num, errFormat string) (int, error) {
 		return n, errors.New(fmt.Sprintf(errFormat, min, max, n))
 	}
 	return n, nil
-}
-
-func checkPageRange(first, last, numPages int) error {
-	if first < 1 || last > numPages || first > last {
-		msg := "Page range [%d,%d] is beyond [1,%d]"
-		return errors.New(fmt.Sprintf(msg, first, last, numPages))
-	}
-	return nil
 }
 
 func coerceArchive(archive string) (fitzimg.Archive, error) {

@@ -88,8 +88,9 @@ Please also consider setting a reasonable request payload size limit to mitigate
 | `width` | yes | Min: `1`; Max: `65500` (theoretical). |
 | `height` | yes | Min: `1`; Max: `65500` (theoretical). |
 | `format` | yes | `jpg`, `jpeg`, `png`, `gif`, `tif`, `tiff`, `bmp`. |
-| `pages` | no | Range `m-n` with `1-8388606` being the max theoretical range. If `n` is larger than the actual page count, an HTTP 400 is returned. Special case `pages=m`, equivalent to `pages=m-m`, indicating a single page is allowed. Using underscore for the last page is also possible, e.g. `pages=1-_` for all pages of the document. Default is the first page. |
-| `archive` | yes/no | If a page range `m-n` is specified with `m`≠`n`, then providing an archive format is mandatory. `zip` and `tar` are possible values for a ZIP archive and a Tarball respectively. |
+| `from` | no | Min: `1`; Max: `8388606` (theoretical). This parameter specifies either the sole page of the document to generate image from, or the first page of a page range if the parameter `archive` is provided. Default is `1`. |
+| `to` | no | Min: `1`; Max: `8388606` (theoretical). The last page of a page range. Must be larger or equal to `from` if provided. Setting this parameter also makes `archive` mandatory. Default is the last page of the document. |
+| `archive` | yes/no | Specifies how the images of the specified page range should be bundled together. This parameter becomes mandatory, if `from` is provided. `zip` and `tar` are possible values for a ZIP archive and a tarball respectively. Images are placed directly within the root directory having filename pattern `imgNNNNNNN.ext`.  |
 | `quality` | no | From `1` to `100` for JPEG (default `95`); `0` to `9` for PNG (default `6`). |
 | `resize` | no | Image resizing mode for cases when the source document has a different aspect ratio than specified by the target dimensions. |
 | `resample` | no | Resampling algorithm, affects both quality and performance. |

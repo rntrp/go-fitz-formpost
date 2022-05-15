@@ -10,56 +10,45 @@ import (
 
 func NumPage(w http.ResponseWriter, r *http.Request) {
 	input := handleFileUpload(w, r)
-	if input == nil {
-		return
-	}
-	numPage, err := fitzimg.NumPage(input)
-	if handleError(w, err) {
+	total, totalOk := handleNumPage(w, input)
+	if !totalOk {
 		return
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	fmt.Fprintf(w, "%d", numPage)
+	fmt.Fprintf(w, "%d", total)
 }
 
 func Convert(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	width, errW := coerceWidth(query.Get("width"))
 	height, errH := coerceHeight(query.Get("height"))
-	pageStart, pageEnd, errP := coercePages(query.Get("pages"))
+	from, errFr := coerceFrom(query.Get("from"))
+	to, errTo := coerceTo(query.Get("to"))
 	format, errF := coerceFormat(query.Get("format"))
 	archive, errO := coerceArchive(query.Get("archive"))
 	quality, errQ := coerceQuality(format, query.Get("quality"))
-	resize, errRZ := coerceResize(query.Get("resize"))
-	resample, errRF := coerceResample(query.Get("resample"))
-	for _, err := range [...]error{errW, errH, errP, errF, errO, errQ, errRZ, errRF} {
+	resize, errRz := coerceResize(query.Get("resize"))
+	resample, errRs := coerceResample(query.Get("resample"))
+	for _, err := range [...]error{errW, errH, errFr, errTo, errF, errO, errQ, errRz, errRs} {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 	}
-	if pageStart != pageEnd && archive == fitzimg.Raw {
-		http.Error(w, "Invalid archive format", http.StatusBadRequest)
-		return
-	}
 	input := handleFileUpload(w, r)
 	if input == nil {
 		return
 	}
-	numPage, err := fitzimg.NumPage(input)
-	if handleError(w, err) {
-		return
-	} else if pageEnd == LastPage {
-		pageEnd = numPage
-	}
-	if err := checkPageRange(pageStart, pageEnd, numPage); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	total, totalOk := handleNumPage(w, input)
+	if !totalOk || !handlePageRange(w, from, to, total, archive) {
 		return
 	}
+	to = resolveLastPage(from, to, total, archive)
 	params := &fitzimg.Params{
 		Width:     width,
 		Height:    height,
-		FirstPage: pageStart - 1,
-		LastPage:  pageEnd - 1,
+		FirstPage: from - 1,
+		LastPage:  to - 1,
 		Archive:   archive,
 		Format:    format,
 		Quality:   quality,
