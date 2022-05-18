@@ -1,10 +1,12 @@
 package rest
 
 import (
+	"archive/zip"
 	"bytes"
-	"encoding/base64"
+	_ "embed"
 	"encoding/hex"
-	"math"
+	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -15,40 +17,44 @@ func init() {
 	config.Load()
 }
 
-const pdfB64 = "JVBERi0xLjAKMSAwIG9iajw8L1BhZ2VzIDIgMCBSPj5lbmRvYmogMiAwIG9iajw8L0tpZHNbMyAwIFJdL0" +
-	"NvdW50IDE+PmVuZG9iaiAzIDAgb2JqPDwvTWVkaWFCb3hbMCAwIDMgM10+PmVuZG9iagp0cmFpbG" +
-	"VyPDwvUm9vdCAxIDAgUj4+Cg=="
-const pdf3PagesB64 = "JVBERi0xLjAKJeLjz9MKMiAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMyAwIFI+Pgpl" +
-	"bmRvYmoKMyAwIG9iago8PCAvVHlwZSAvUGFnZXMgL0tpZHMgWyA0IDAgUiA1IDAgUiA2IDAgUiBd" +
-	"IC9Db3VudCAzID4+CmVuZG9iago0IDAgb2JqCjw8IC9NZWRpYUJveCBbMCAwIDMgMyBdICAvVHJp" +
-	"bUJveCBbMCAwIDMgMyBdICAvUm90YXRlIDAgID4+CmVuZG9iago1IDAgb2JqCjw8IC9NZWRpYUJv" +
-	"eCBbMCAwIDMgMyBdICAvVHJpbUJveCBbMCAwIDMgMyBdICAvUm90YXRlIDAgID4+CmVuZG9iago2" +
-	"IDAgb2JqCjw8IC9NZWRpYUJveCBbMCAwIDMgMyBdICAvVHJpbUJveCBbMCAwIDMgMyBdICAvUm90" +
-	"YXRlIDAgID4+CmVuZG9iagp4cmVmDQowIDcNCjAwMDAwMDAwMDEgNjU1MzUgZg0KMDAwMDAwMDAw" +
-	"MCAwMDAwMCBmDQowMDAwMDAwMDE1IDAwMDAwIG4NCjAwMDAwMDAwNjMgMDAwMDAgbg0KMDAwMDAw" +
-	"MDEzNCAwMDAwMCBuDQowMDAwMDAwMjA5IDAwMDAwIG4NCjAwMDAwMDAyODQgMDAwMDAgbg0KdHJh" +
-	"aWxlcg0KPDwvU2l6ZSA1IC9JRCBbKJI0YKT5scABPrNkOEg8/MMpICiSNGCk+bHAAT6zZDhIPPzD" +
-	"KSBdIC9Sb290IDIgMCBSID4+IA0Kc3RhcnR4cmVmDQozNTkNCiUlRU9GDQo=+PmVuZG9iaiAzIDA" +
-	"gb2JqPDwvTWVkaWFCb3hbMCAwIDMgM10+PmVuZG9iagp0cmFpbGVyPDwvUm9vdCAxIDAgUj4+Cg=="
+//go:embed test.pdf
+var pdf []byte
 
-func TestConvert(t *testing.T) {
-	rec := httptest.NewRecorder()
-
-	pdfBytes, _ := base64.StdEncoding.DecodeString(pdfB64)
+func testInitPostReq(query string) *http.Request {
 	body := []byte("--boundary\r\nContent-Disposition: form-data; name=\"pdf\"; filename=\"pdf\"\r\n\r\n")
-	body = append(body, pdfBytes...)
+	body = append(body, pdf...)
 	body = append(body, []byte("\r\n--boundary--")...)
-	req := httptest.NewRequest("POST", "/convert?width=2&height=2&from=1&format=png", bytes.NewReader(body))
+	req := httptest.NewRequest("POST", query, bytes.NewReader(body))
 	req.Header.Add("Content-Type", "multipart/form-data; boundary=\"boundary\"")
+	return req
+}
 
-	Convert(rec, req)
+func TestPages(t *testing.T) {
+	rec := httptest.NewRecorder()
+	req := testInitPostReq("/pages")
 
+	NumPage(rec, req)
 	if rec.Code != 200 {
 		t.Errorf("rec.Code = %v; want 200", rec.Code)
 	}
 
-	out := rec.Body.Bytes()
-	outMagic := out[:int(math.Min(8, float64(len(out))))]
+	pages := string(rec.Body.Bytes())
+	if pages != "3" {
+		t.Errorf("Number of pages = %v; want 3", pages)
+	}
+}
+
+func TestConvert(t *testing.T) {
+	rec := httptest.NewRecorder()
+	req := testInitPostReq("/convert?width=2&height=2&from=1&format=png")
+
+	Convert(rec, req)
+	if rec.Code != 200 {
+		t.Errorf("rec.Code = %v; want 200", rec.Code)
+	}
+
+	outMagic := make([]byte, 8)
+	rec.Body.Read(outMagic)
 	pngMagic, _ := hex.DecodeString("89504e470d0a1a0a")
 	if !bytes.Equal(outMagic, pngMagic) {
 		got := hex.EncodeToString(outMagic)
@@ -56,15 +62,9 @@ func TestConvert(t *testing.T) {
 	}
 }
 
-func TestArchiveConvert(t *testing.T) {
+func TestConvertArchive(t *testing.T) {
 	rec := httptest.NewRecorder()
-
-	pdfBytes, _ := base64.StdEncoding.DecodeString(pdf3PagesB64)
-	body := []byte("--boundary\r\nContent-Disposition: form-data; name=\"pdf\"; filename=\"pdf\"\r\n\r\n")
-	body = append(body, pdfBytes...)
-	body = append(body, []byte("\r\n--boundary--")...)
-	req := httptest.NewRequest("POST", "/convert?width=2&height=2&from=1&format=png", bytes.NewReader(body))
-	req.Header.Add("Content-Type", "multipart/form-data; boundary=\"boundary\"")
+	req := testInitPostReq("/convert?width=2&height=2&from=1&to=2&archive=zip&format=png")
 
 	Convert(rec, req)
 
@@ -73,10 +73,35 @@ func TestArchiveConvert(t *testing.T) {
 	}
 
 	out := rec.Body.Bytes()
-	outMagic := out[:int(math.Min(8, float64(len(out))))]
-	pngMagic, _ := hex.DecodeString("89504e470d0a1a0a")
-	if !bytes.Equal(outMagic, pngMagic) {
+
+	outMagic := out[:4]
+	zipMagic, _ := hex.DecodeString("504b0304")
+	if !bytes.Equal(outMagic, zipMagic) {
 		got := hex.EncodeToString(outMagic)
-		t.Errorf("rec.Body PNG Magic Number = %v; want 89504e470d0a1a0a", got)
+		t.Errorf("rec.Body ZIP Magic Number = %v; want 504b0304", got)
+	}
+
+	zipReader, _ := zip.NewReader(bytes.NewReader(out), int64(len(out)))
+	numFiles := len(zipReader.File)
+	if numFiles != 2 {
+		t.Errorf("Number of zipped files = %v; want 2", numFiles)
+	}
+
+	pngMagic, _ := hex.DecodeString("89504e470d0a1a0a")
+	for i, zipFile := range zipReader.File {
+		gotName := zipFile.Name
+		wantName := fmt.Sprintf("img%07d.png", i+1)
+		if gotName != wantName {
+			t.Errorf("PNG file name = %v; want %v", gotName, wantName)
+		}
+
+		gotMagic := make([]byte, 8)
+		file, _ := zipFile.Open()
+		file.Read(gotMagic)
+		file.Close()
+		if !bytes.Equal(gotMagic, pngMagic) {
+			got := hex.EncodeToString(gotMagic)
+			t.Errorf("rec.Body PNG Magic Number = %v; want 89504e470d0a1a0a", got)
+		}
 	}
 }
