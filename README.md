@@ -30,10 +30,10 @@ $ docker-compose up
 ```
 
 ## Usage
-Send a `multipart/form-data` request with a single file named `pdf` to the `/scale` endpoint. Width and height of the target image is set via the URL query parameters `width` and `height` respectively. Optionally, image output `format` can be specified (`jpeg`, `png`, `gif`, `tiff` or `bmp`)
+Send a `multipart/form-data` request with a single file named `pdf` to the `/convert` endpoint. Width and height of the target image is set via the URL query parameters `width` and `height` respectively. Optionally, image output `format` can be specified (`jpeg`, `png`, `gif`, `tiff` or `bmp`)
 
 ```bash
-$ curl -F pdf=@/path/to/in.pdf -o /path/to/out.png http://localhost:8080/scale?width=200&height=200&format=png
+$ curl -F pdf=@/path/to/in.pdf -o /path/to/out.png http://localhost:8080/convert?width=200&height=200&format=png
 ```
 
 Alternatively, there is also an endpoint serving basic HTML form upload page. It is available under http://localhost:8080 or http://localhost:8080/index.html.
