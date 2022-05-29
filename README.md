@@ -1,5 +1,5 @@
-# PDF to Image Formpost Microservice
-A microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go wrapper for the [MuPDF](https://mupdf.com/) Fitz library. Accepts PDF documents via `multipart/form-data` POST requests, delivers images in response.
+# Document to Image Formpost Microservice
+A microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go wrapper for the [MuPDF](https://mupdf.com/) Fitz library. Accepts PDF and EPUB documents via `multipart/form-data` POST requests, delivers images in response.
 
 ## Build & Launch
 Besides Go 1.16, MuPDF needs to be installed separately.
