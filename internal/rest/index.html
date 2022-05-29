@@ -49,7 +49,7 @@
 			<form id="form1" action="#" method="POST" enctype="multipart/form-data">
 				<p>
 					<label for="convert">Document*:</label>
-					<input id="convert" type="file" name="pdf" accept="application/pdf">
+					<input id="convert" type="file" name="doc" accept=".pdf,.epub,application/pdf,application/epub+zip">
 				</p>
 				<p>
 					<label for="width">Width*:</label>
@@ -147,10 +147,10 @@
 				<textarea id="url" rows="3" cols="40" readonly></textarea>
 			</p>
 			<h1>Retrieve Page Count</h1>
-			<form action="scale" method="POST" enctype="multipart/form-data">
+			<form action="pages" method="POST" enctype="multipart/form-data">
 				<p>
 					<label for="count">Document*:</label>
-					<input id="count" type="file" name="pdf" accept="application/pdf">
+					<input id="count" type="file" name="doc" accept=".pdf,.epub,application/pdf,application/epub+zip">
 				</p>
 				<p>
 					<label for="upload">Upload:</label>
@@ -160,7 +160,7 @@
 			<h1>Notes</h1>
 			<p>* Mandatory field</p>
 			<p><sup>1</sup> 0-100 for JPEGs, 0-9 for PNG compression</p>
-			<p><sup>2</sup> Mandatory if pages is set to multiple</p>
+			<p><sup>2</sup> Mandatory if first or last page is set</p>
 		</div>
 	</body>
 </html>

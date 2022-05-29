@@ -56,9 +56,9 @@ func handleFileUpload(w http.ResponseWriter, r *http.Request) []byte {
 	} else if r.MultipartForm != nil {
 		defer r.MultipartForm.RemoveAll()
 	}
-	f, fh, err := r.FormFile("pdf")
+	f, fh, err := r.FormFile("doc")
 	if err != nil {
-		http.Error(w, "File 'pdf' is missing", http.StatusBadRequest)
+		http.Error(w, "File 'doc' is missing", http.StatusBadRequest)
 		return nil
 	}
 	defer f.Close()

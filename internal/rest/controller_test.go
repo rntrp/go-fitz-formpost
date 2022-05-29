@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"encoding/hex"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,11 +22,13 @@ func init() {
 var pdf []byte
 
 func testInitPostReq(query string) *http.Request {
-	body := []byte("--boundary\r\nContent-Disposition: form-data; name=\"pdf\"; filename=\"pdf\"\r\n\r\n")
-	body = append(body, pdf...)
-	body = append(body, []byte("\r\n--boundary--")...)
-	req := httptest.NewRequest("POST", query, bytes.NewReader(body))
-	req.Header.Add("Content-Type", "multipart/form-data; boundary=\"boundary\"")
+	body := new(bytes.Buffer)
+	multipartWriter := multipart.NewWriter(body)
+	formPart, _ := multipartWriter.CreateFormFile("doc", "test.pdf")
+	formPart.Write(pdf)
+	multipartWriter.Close()
+	req := httptest.NewRequest("POST", query, body)
+	req.Header.Add("Content-Type", multipartWriter.FormDataContentType())
 	return req
 }
 
