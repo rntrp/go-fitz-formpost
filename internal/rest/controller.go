@@ -10,6 +10,9 @@ import (
 
 func NumPage(w http.ResponseWriter, r *http.Request) {
 	input := handleFileUpload(w, r)
+	if input == nil {
+		return
+	}
 	total, totalOk := handleNumPage(w, input)
 	if !totalOk {
 		return
