@@ -1,9 +1,7 @@
 FROM golang:1.18-alpine3.15 AS builder
 RUN apk add --no-cache build-base
 WORKDIR /app
-COPY go.mod ./
-COPY go.sum ./
-COPY main.go ./
+COPY go.mod go.sum main.go ./
 COPY internal ./internal
 RUN go mod download \
     && go test -tags musl ./... \
