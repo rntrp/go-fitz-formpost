@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -49,6 +50,7 @@ func loadNonSecrets() {
 	v.FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT = parseBool("FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT", false)
 	v.FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS = parseDuration("FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS", 0, time.Second)
 	v.FITZ_FORMPOST_PROCESSING_MODE = parseProcessingMode("FITZ_FORMPOST_PROCESSING_MODE", Serialized)
+	v.FITZ_FORMPOST_RENDERING_DPI = parseDPI("FITZ_FORMPOST_RENDERING_DPI", 300.0)
 }
 
 func parseBool(env string, def bool) bool {
@@ -72,6 +74,13 @@ func parseInt64(env string, def int64) int64 {
 	return def
 }
 
+func parseFloat64(env string, def float64) float64 {
+	if f, err := strconv.ParseFloat(os.Getenv(env), 64); err == nil {
+		return f
+	}
+	return def
+}
+
 func parseDuration(env string, def int64, unit time.Duration) time.Duration {
 	return time.Duration(parseInt64(os.Getenv(env), def)) * unit
 }
@@ -81,4 +90,12 @@ func parseProcessingMode(env string, def ProcessingMode) ProcessingMode {
 		return pm
 	}
 	return def
+}
+
+func parseDPI(env string, def float64) float64 {
+	f := parseFloat64(env, def)
+	if f < 1 || math.IsInf(f, 0) || math.IsNaN(f) {
+		return def
+	}
+	return f
 }

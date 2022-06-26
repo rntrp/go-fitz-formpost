@@ -64,6 +64,7 @@ The application supports configuration via environment variables or a `.env` fil
 | `FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT` | `false` | Enable shutdown endpoint under `/shutdown`. A single POST request with arbitrary payload to this endpoint will cause the application to shutdown gracefully. |
 | `FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS` | `0` | Specifies amount of seconds to wait before ongoing requests are forcefully cancelled in order to perform a graceful shutdown. A zero value lets the application wait indefinetely for all requests to complete. |
 | `FITZ_FORMPOST_PROCESSING_MODE` | `serialized` | Choose between `serialized`, `interleaved` and `inmemory` processing modes. |
+| `FITZ_FORMPOST_RENDERING_DPI` | `300` | Sets the default DPI resolution at which the source PDF document is rasterized. Higher value improves font and image quality (both vector and large enough raster images) but also increases memory and CPU usage. Lower DPI values may result in upscaling of the intermediate raster image, hence nullifying potential quality surplus of higher target dimensions. Any `float64` value between `1` and `math.MaxFloat64` is allowed. Traditional values are `72`, `150`, `200`, `300`, `600`, `1200` and so on. |
 
 #### Processing Modes
 | value | description |

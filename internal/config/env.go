@@ -13,6 +13,7 @@ type values struct {
 	FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT bool
 	FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS time.Duration
 	FITZ_FORMPOST_PROCESSING_MODE          ProcessingMode
+	FITZ_FORMPOST_RENDERING_DPI            float64
 }
 
 var v values
@@ -69,4 +70,8 @@ var processingModeStrings = map[string]ProcessingMode{
 
 func GetProcessingMode() ProcessingMode {
 	return v.FITZ_FORMPOST_PROCESSING_MODE
+}
+
+func GetRenderingDPI() float64 {
+	return v.FITZ_FORMPOST_RENDERING_DPI
 }

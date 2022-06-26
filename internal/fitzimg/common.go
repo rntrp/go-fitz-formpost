@@ -81,7 +81,7 @@ func transfer(dst string, out interface{}, name string, params *Params) error {
 }
 
 func encode(doc *fitz.Document, bkg draw.Image, dst io.Writer, page int, params *Params) error {
-	img, err := doc.ImageDPI(page, 72.0)
+	img, err := doc.ImageDPI(page, config.GetRenderingDPI())
 	if err != nil {
 		return err
 	}
