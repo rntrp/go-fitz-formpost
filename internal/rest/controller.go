@@ -43,10 +43,13 @@ func Convert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	total, totalOk := handleNumPage(w, input)
-	if !totalOk || !handlePageRange(w, from, to, total, archive) {
+	if !totalOk {
 		return
 	}
 	to = resolveLastPage(from, to, total, archive)
+	if !handlePageRange(w, from, to, total, archive) {
+		return
+	}
 	params := &fitzimg.Params{
 		Width:     width,
 		Height:    height,
