@@ -5,10 +5,15 @@ A microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go 
 Besides Go 1.16, MuPDF needs to be installed separately.
 
 ### Locally
-Follow [build instructions](https://github.com/gen2brain/go-fitz) for `go-fitz` with MuPDF. When linking against shared libraries, one may want to set the `CGO_LDFLAGS` environment variable, e.g.:
+Follow [build instructions](https://github.com/gen2brain/go-fitz) for `go-fitz` with MuPDF. When linking against shared libraries, one may want to set the `CGO_LDFLAGS` environment variable.
+
+There are also prebuilt libraries for `go-fitz` found under gen2brain/go-fitz/tree/master/libs. Using those on Ubuntu, macOS or Windows makes building straightforward:
 ```bash
-export CGO_LDFLAGS="-lmupdf -lm -lmupdf-third -lfreetype -ljbig2dec -lharfbuzz -ljpeg -lopenjp2 -lz" \
-    && go build -o /go-fitz-rest
+$ go build -o /go-fitz-formpost
+```
+On Alpine Linux this would be:
+```bash
+$ go build -tags musl -o /go-fitz-formpost
 ```
 
 Note that `harfbuzz` [isn't listed as a dependency in MuPDF docs](https://mupdf.com/docs/building.html), but is indeed required.
