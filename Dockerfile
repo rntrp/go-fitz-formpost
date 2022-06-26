@@ -1,5 +1,5 @@
 FROM golang:1.17-alpine3.15 AS builder
-RUN apk add --no-cache build-base mupdf-dev
+RUN apk add --no-cache build-base
 WORKDIR /app
 COPY go.mod ./
 COPY go.sum ./
