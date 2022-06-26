@@ -11,8 +11,9 @@ import (
 	"github.com/rntrp/go-fitz-formpost/internal/fitzimg"
 )
 
-// https://stackoverflow.com/q/17279712
-const MinValidFileSize = 64
+// Netpbm formates have the smallest valid file size of 8 bytes
+// See https://github.com/mathiasbynens/small
+const MinValidFileSize = 8
 
 // Theoretical max dimensions according to its respective specs:
 //
