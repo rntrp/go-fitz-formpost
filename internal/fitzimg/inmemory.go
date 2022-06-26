@@ -11,7 +11,7 @@ import (
 	"github.com/gen2brain/go-fitz"
 )
 
-func inMemory(src []byte, dst io.Writer, params *Params) error {
+func inMemory(doc *fitz.Document, dst io.Writer, params *Params) error {
 	out, closer := initArchive(params.Archive, dst)
 	buf := new(bytes.Buffer)
 	bkg := background(params.Width, params.Height, params.Resize)
@@ -19,7 +19,7 @@ func inMemory(src []byte, dst io.Writer, params *Params) error {
 	to := params.LastPage
 	for page := from; page <= to; page++ {
 		buf.Reset()
-		if err := direct(src, buf, bkg, out, page, params); err != nil {
+		if err := direct(doc, buf, bkg, out, page, params); err != nil {
 			return err
 		}
 	}
@@ -29,12 +29,7 @@ func inMemory(src []byte, dst io.Writer, params *Params) error {
 	return nil
 }
 
-func direct(src []byte, buf *bytes.Buffer, bkg draw.Image, dst interface{}, page int, params *Params) error {
-	doc, err := fitz.NewFromMemory(src)
-	if err != nil {
-		return err
-	}
-	defer doc.Close()
+func direct(doc *fitz.Document, buf *bytes.Buffer, bkg draw.Image, dst interface{}, page int, params *Params) error {
 	switch params.Archive {
 	case Tar:
 		return directTar(doc, buf, bkg, dst.(*tar.Writer), page, params)

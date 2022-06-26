@@ -4,14 +4,16 @@ import (
 	"io"
 	"os"
 	"sync/atomic"
+
+	"github.com/gen2brain/go-fitz"
 )
 
-func interleave(src []byte, dst io.Writer, params *Params) error {
+func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 	from := params.FirstPage
 	to := params.LastPage
 	if from == to {
 		// Fallback to serial for single pages
-		return serial(src, dst, params)
+		return serial(doc, dst, params)
 	}
 	duo, err := initTmpDuo()
 	if err != nil {
@@ -21,7 +23,7 @@ func interleave(src []byte, dst io.Writer, params *Params) error {
 	out, closer := initArchive(params.Archive, dst)
 	receive := make(chan error, 1)
 	cancel := int32(0)
-	go work(receive, &cancel, src, duo, params)
+	go work(receive, &cancel, doc, duo, params)
 	for page := from; page <= to; page++ {
 		if err := <-receive; err != nil {
 			return err
@@ -39,13 +41,13 @@ func interleave(src []byte, dst io.Writer, params *Params) error {
 	return nil
 }
 
-func work(send chan error, cancel *int32, src []byte, duo [2]string, params *Params) {
+func work(send chan error, cancel *int32, doc *fitz.Document, duo [2]string, params *Params) {
 	defer close(send)
 	bkg := background(params.Width, params.Height, params.Resize)
 	from := params.FirstPage
 	to := params.LastPage
 	for page := from; page <= to && atomic.LoadInt32(cancel) == 0; page++ {
-		err := dump(src, bkg, duo[page&1], page, params)
+		err := dump(doc, bkg, duo[page&1], page, params)
 		if send <- err; err != nil {
 			return
 		}

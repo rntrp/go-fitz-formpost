@@ -50,8 +50,8 @@ func background(width, height int, resize Resize) *image.NRGBA {
 	return bkg
 }
 
-func process(src []byte, bkg draw.Image, dst string, out interface{}, page int, params *Params) error {
-	if err := dump(src, bkg, dst, page, params); err != nil {
+func process(doc *fitz.Document, bkg draw.Image, dst string, out interface{}, page int, params *Params) error {
+	if err := dump(doc, bkg, dst, page, params); err != nil {
 		return err
 	}
 	n := name(page, params.Format)
@@ -62,12 +62,7 @@ func name(page int, format imaging.Format) string {
 	return fmt.Sprintf("img%07d.%s", page+1, filenameExtensions[format])
 }
 
-func dump(src []byte, bkg draw.Image, dst string, page int, params *Params) error {
-	doc, err := fitz.NewFromMemory(src)
-	if err != nil {
-		return err
-	}
-	defer doc.Close()
+func dump(doc *fitz.Document, bkg draw.Image, dst string, page int, params *Params) error {
 	img, err := os.OpenFile(dst, os.O_WRONLY|os.O_TRUNC|os.O_EXCL, 0600)
 	if err != nil {
 		return err

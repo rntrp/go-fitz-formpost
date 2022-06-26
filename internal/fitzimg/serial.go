@@ -1,8 +1,12 @@
 package fitzimg
 
-import "io"
+import (
+	"io"
 
-func serial(src []byte, dst io.Writer, params *Params) error {
+	"github.com/gen2brain/go-fitz"
+)
+
+func serial(doc *fitz.Document, dst io.Writer, params *Params) error {
 	tmp, err := initTmp()
 	if err != nil {
 		return err
@@ -13,7 +17,7 @@ func serial(src []byte, dst io.Writer, params *Params) error {
 	from := params.FirstPage
 	to := params.LastPage
 	for page := from; page <= to; page++ {
-		if err := process(src, bkg, tmp, out, page, params); err != nil {
+		if err := process(doc, bkg, tmp, out, page, params); err != nil {
 			return err
 		}
 	}

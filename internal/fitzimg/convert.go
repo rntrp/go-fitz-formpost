@@ -26,13 +26,18 @@ func NumPage(src []byte) (int, error) {
 
 func Convert(src []byte, dst io.Writer, params *Params) error {
 	defer preventGC(src)
+	doc, err := fitz.NewFromMemory(src)
+	if err != nil {
+		return err
+	}
+	defer doc.Close()
 	switch config.GetProcessingMode() {
 	case config.Interleaved:
-		return interleave(src, dst, params)
+		return interleave(doc, dst, params)
 	case config.InMemory:
-		return inMemory(src, dst, params)
+		return inMemory(doc, dst, params)
 	default:
-		return serial(src, dst, params)
+		return serial(doc, dst, params)
 	}
 }
 
