@@ -9,19 +9,18 @@ Follow [build instructions](https://github.com/gen2brain/go-fitz) for `go-fitz` 
 
 There are also prebuilt libraries for `go-fitz` found under gen2brain/go-fitz/tree/master/libs. Using those on Ubuntu, macOS or Windows makes building straightforward:
 ```bash
+$ go mod download
 $ go build -o /go-fitz-formpost
 ```
 On Alpine Linux this would be:
 ```bash
 $ go build -tags musl -o /go-fitz-formpost
 ```
-
-Note that `harfbuzz` [isn't listed as a dependency in MuPDF docs](https://mupdf.com/docs/building.html), but is indeed required.
-
 Finally, run the application at port 8080:
 ```bash
 $ go run .
 ```
+> :warning: **Issues with vendoring**: Unfortunately `go mod vendor` does not pull the header files and binaries from the `go-fitz` repository. This issue is discussed at golang/go/issues/26366. Please stay with `go mod download` instead.
 
 ### With Docker
 ```bash
