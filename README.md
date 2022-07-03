@@ -16,9 +16,13 @@ On Alpine Linux this would be:
 ```bash
 $ go build -tags musl -o /go-fitz-formpost
 ```
-Finally, run the application at port 8080:
+Or you can also build and run the application at port 8080:
 ```bash
 $ go run .
+```
+Alpine still requires the tag:
+```bash
+$ go run -tags musl .
 ```
 If you are updating the dependencies locally, you may want to update `go.sum`:
 ```bash
