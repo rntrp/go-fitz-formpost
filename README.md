@@ -7,7 +7,7 @@ Besides Go 1.16, MuPDF needs to be installed separately.
 ### Locally
 Follow [build instructions](https://github.com/gen2brain/go-fitz) for `go-fitz` with MuPDF. When linking against shared libraries, one may want to set the `CGO_LDFLAGS` environment variable.
 
-There are also prebuilt libraries for `go-fitz` found under gen2brain/go-fitz/tree/master/libs. Using those on Ubuntu, macOS or Windows makes building straightforward:
+`go-fitz` provides [prebuilt libraries](https://github.com/gen2brain/go-fitz/tree/master/libs) for common operating systems and acrhitectures. Using those on Ubuntu, macOS or Windows makes building straightforward:
 ```bash
 $ go mod download
 $ go build -o /go-fitz-formpost
@@ -19,6 +19,11 @@ $ go build -tags musl -o /go-fitz-formpost
 Finally, run the application at port 8080:
 ```bash
 $ go run .
+```
+If you are updating the dependencies locally, you may want to update `go.sum`:
+```bash
+$ go mod download
+$ go mod tidy
 ```
 > :warning: **Issues with vendoring**: Unfortunately `go mod vendor` does not pull the header files and binaries from the `go-fitz` repository. This issue is discussed at golang/go/issues/26366. Please stay with `go mod download` instead.
 
