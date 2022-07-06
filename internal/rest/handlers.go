@@ -28,14 +28,14 @@ func handlePageRange(w http.ResponseWriter, from, to, total int, archive fitzimg
 	var msg string
 	switch archive {
 	case fitzimg.Raw:
-		if from != to && to != LastPage {
-			msg = fmt.Sprintf("Missing 'archive' for page range [%d;%d]", from, to)
+		if from != to && to != lastPage {
+			msg = fmt.Sprintf("missing 'archive' for page range [%d;%d]", from, to)
 		} else if from > total {
-			msg = fmt.Sprintf("Requested page %d exceeds page count of %d", from, total)
+			msg = fmt.Sprintf("requested page %d exceeds page count of %d", from, total)
 		}
 	default:
 		if to > total || from > to {
-			msg = fmt.Sprintf("Page range [%d;%d] is beyond [1;%d]", from, to, total)
+			msg = fmt.Sprintf("page range [%d;%d] is beyond [1;%d]", from, to, total)
 		}
 	}
 	if len(msg) > 0 {
@@ -58,12 +58,12 @@ func handleFileUpload(w http.ResponseWriter, r *http.Request) []byte {
 	}
 	f, fh, err := r.FormFile("doc")
 	if err != nil {
-		http.Error(w, "File 'doc' is missing", http.StatusBadRequest)
+		http.Error(w, "file 'doc' is missing", http.StatusBadRequest)
 		return nil
 	}
 	defer f.Close()
-	if fh.Size < MinValidFileSize {
-		http.Error(w, "File size too small for a valid document",
+	if fh.Size < minValidFileSize {
+		http.Error(w, "file size too small for a valid document",
 			http.StatusBadRequest)
 		return nil
 	}
@@ -79,7 +79,7 @@ func handleFileUpload(w http.ResponseWriter, r *http.Request) []byte {
 
 func resolveLastPage(from, to, total int, archive fitzimg.Archive) int {
 	switch {
-	case to != LastPage:
+	case to != lastPage:
 		return to
 	case archive == fitzimg.Raw:
 		return from
@@ -90,8 +90,8 @@ func resolveLastPage(from, to, total int, archive fitzimg.Archive) int {
 
 func setupFileSizeChecks(w http.ResponseWriter, r *http.Request) bool {
 	clen, err := coerceContentLength(r.Header.Get("Content-Length"))
-	if err == nil && clen < MinValidFileSize {
-		http.Error(w, "Content-Length too short for a valid document",
+	if err == nil && clen < minValidFileSize {
+		http.Error(w, "http: Content-Length too short for a valid document",
 			http.StatusBadRequest)
 		return false
 	}

@@ -41,7 +41,7 @@ func TestPages(t *testing.T) {
 		t.Errorf("rec.Code = %v; want 200", rec.Code)
 	}
 
-	pages := string(rec.Body.Bytes())
+	pages := rec.Body.String()
 	if pages != "3" {
 		t.Errorf("Number of pages = %v; want 3", pages)
 	}
