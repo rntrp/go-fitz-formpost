@@ -5,7 +5,8 @@ COPY . ./
 COPY internal ./internal
 RUN go mod download \
     && go test -tags musl ./... \
-    && go build -tags musl -ldflags="-s -w" -o /go-fitz-formpost
+    && go build -tags musl -ldflags="-s -w" -o /go-fitz-formpost \
+    && upx --best --lzma /go-fitz-formpost
 
 FROM alpine:3.15
 COPY --from=builder /go-fitz-formpost ./
