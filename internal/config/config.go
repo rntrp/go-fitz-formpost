@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"log"
 	"math"
 	"os"
@@ -15,23 +14,15 @@ import (
 
 func Load() {
 	// https://github.com/joho/godotenv#precedence--conventions
-	v.FITZ_FORMPOST_ENV = os.Getenv("FITZ_FORMPOST_ENV")
-	if len(v.FITZ_FORMPOST_ENV) == 0 {
-		v.FITZ_FORMPOST_ENV = "development"
-	}
-	v.FITZ_FORMPOST_ENV_DIR = os.Getenv("FITZ_FORMPOST_ENV_DIR")
+	loadDotEnv()
 	tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env."+v.FITZ_FORMPOST_ENV+".local")
 	if v.FITZ_FORMPOST_ENV != "test" {
 		tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env.local")
 	}
 	tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env."+v.FITZ_FORMPOST_ENV)
 	tryLoad(v.FITZ_FORMPOST_ENV_DIR, ".env")
-	loadNonSecrets()
-	if j, err := json.MarshalIndent(&v, "", "  "); err == nil {
-		log.Println("Environment: " + string(j))
-	} else {
-		log.Panicln(err)
-	}
+	loadEnv()
+	v.print()
 }
 
 func tryLoad(path, file string) {
@@ -41,14 +32,22 @@ func tryLoad(path, file string) {
 	}
 }
 
-func loadNonSecrets() {
+func loadDotEnv() {
+	v.FITZ_FORMPOST_ENV = os.Getenv("FITZ_FORMPOST_ENV")
+	if len(v.FITZ_FORMPOST_ENV) == 0 {
+		v.FITZ_FORMPOST_ENV = "development"
+	}
+	v.FITZ_FORMPOST_ENV_DIR = os.Getenv("FITZ_FORMPOST_ENV_DIR")
+}
+
+func loadEnv() {
 	v.FITZ_FORMPOST_TCP_ADDRESS = parseString("FITZ_FORMPOST_TCP_ADDRESS", ":8080")
-	v.FITZ_FORMPOST_TEMP_DIR = parseString("FITZ_FORMPOST_TEMP_DIR", "")
+	v.FITZ_FORMPOST_TEMP_DIR = parseString("FITZ_FORMPOST_TEMP_DIR", os.TempDir())
 	v.FITZ_FORMPOST_MAX_REQUEST_SIZE = parseInt64("FITZ_FORMPOST_MAX_REQUEST_SIZE", -1)
 	v.FITZ_FORMPOST_MEMORY_BUFFER_SIZE = parseInt64("FITZ_FORMPOST_MEMORY_BUFFER_SIZE", 10<<20)
 	v.FITZ_FORMPOST_ENABLE_PROMETHEUS = parseBool("FITZ_FORMPOST_ENABLE_PROMETHEUS", false)
 	v.FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT = parseBool("FITZ_FORMPOST_ENABLE_SHUTDOWN_ENDPOINT", false)
-	v.FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS = parseDuration("FITZ_FORMPOST_SHUTDOWN_TIMEOUT_SECONDS", 0, time.Second)
+	v.FITZ_FORMPOST_SHUTDOWN_TIMEOUT = parseDuration("FITZ_FORMPOST_SHUTDOWN_TIMEOUT", 0)
 	v.FITZ_FORMPOST_PROCESSING_MODE = parseProcessingMode("FITZ_FORMPOST_PROCESSING_MODE", Serialized)
 	v.FITZ_FORMPOST_RENDERING_DPI = parseDPI("FITZ_FORMPOST_RENDERING_DPI", 300.0)
 }
@@ -81,8 +80,11 @@ func parseFloat64(env string, def float64) float64 {
 	return def
 }
 
-func parseDuration(env string, def int64, unit time.Duration) time.Duration {
-	return time.Duration(parseInt64(os.Getenv(env), def)) * unit
+func parseDuration(env string, def time.Duration) time.Duration {
+	if d, err := time.ParseDuration(os.Getenv(env)); err == nil {
+		return d
+	}
+	return def
 }
 
 func parseProcessingMode(env string, def ProcessingMode) ProcessingMode {

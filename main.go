@@ -17,6 +17,7 @@ import (
 )
 
 func init() {
+	log.Println("Loading GO-FITZ-FORMPOST...")
 	config.Load()
 }
 
