@@ -46,7 +46,7 @@ func background(width, height int, resize Resize) *image.NRGBA {
 		return nil
 	}
 	bkg := image.NewNRGBA(image.Rect(0, 0, width, height))
-	draw.Draw(bkg, bkg.Bounds(), color, image.ZP, draw.Src)
+	draw.Draw(bkg, bkg.Bounds(), color, image.Point{}, draw.Src)
 	return bkg
 }
 
