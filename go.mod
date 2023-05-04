@@ -1,13 +1,13 @@
 module github.com/rntrp/go-fitz-formpost
 
-go 1.17
+go 1.20
 
 require (
 	github.com/disintegration/imaging v1.6.2
-	github.com/gen2brain/go-fitz v1.20.2
+	github.com/gen2brain/go-fitz v1.22.1
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/joho/godotenv v1.5.1
-	github.com/prometheus/client_golang v1.15.0
+	github.com/prometheus/client_golang v1.15.1
 )
 
 require (
