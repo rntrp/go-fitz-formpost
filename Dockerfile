@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine3.17 AS builder
+FROM golang:1.21-alpine3.18 AS builder
 RUN apk add --no-cache build-base upx
 WORKDIR /app
 COPY . ./
@@ -8,7 +8,7 @@ RUN go mod download \
     && go build -tags musl -ldflags="-s -w" -o /go-fitz-formpost \
     && upx --best --lzma /go-fitz-formpost
 
-FROM alpine:3.17
+FROM alpine:3.18
 COPY --from=builder /go-fitz-formpost ./
 EXPOSE 8080
 ENV FITZ_FORMPOST_ENV production
