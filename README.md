@@ -1,8 +1,13 @@
+[![Release](https://img.shields.io/github/v/release/rntrp/go-fitz-formpost)](https://github.com/rntrp/go-fitz-formpost/releases)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/rntrp/go-fitz-formpost)](https://go.dev/dl/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rntrp/go-fitz-formpost)](https://goreportcard.com/report/github.com/rntrp/go-fitz-formpost)
+[![Docker Image](https://img.shields.io/docker/image-size/rntrp/go-fitz-formpost/latest?logo=docker)](https://hub.docker.com/r/rntrp/go-fitz-formpost)
+
 # Document to Image Formpost Microservice
 A microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go wrapper for the [MuPDF](https://mupdf.com/) Fitz library. Accepts PDF and EPUB documents via `multipart/form-data` POST requests, delivers images in response.
 
 ## Build & Launch
-Besides Go 1.16, MuPDF needs to be installed separately.
+Besides Go 1.20, MuPDF needs to be installed separately.
 
 ### Locally
 Follow [build instructions](https://github.com/gen2brain/go-fitz) for `go-fitz` with MuPDF. When linking against shared libraries, one may want to set the `CGO_LDFLAGS` environment variable.
