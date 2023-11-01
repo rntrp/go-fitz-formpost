@@ -2,7 +2,7 @@ package rest
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -67,7 +67,7 @@ func handleFileUpload(w http.ResponseWriter, r *http.Request) []byte {
 			http.StatusBadRequest)
 		return nil
 	}
-	input, err := ioutil.ReadAll(f)
+	input, err := io.ReadAll(f)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError),

@@ -6,7 +6,6 @@ import (
 	"image/draw"
 	"image/png"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -17,7 +16,7 @@ import (
 
 func initTmp() (string, error) {
 	dir := config.GetTempDir()
-	f, err := ioutil.TempFile(dir, "fitz.*.image")
+	f, err := os.CreateTemp(dir, "fitz.*.image")
 	if err != nil {
 		return "", err
 	}
