@@ -22,15 +22,15 @@ func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 	defer removeTmpDuo(duo)
 	out, closer := initArchive(params.Archive, dst)
 	receive := make(chan error, 1)
-	cancel := int32(0)
-	go work(receive, &cancel, doc, duo, params)
+	cancel := new(atomic.Bool)
+	go work(receive, cancel, doc, duo, params)
 	for page := from; page <= to; page++ {
 		if err := <-receive; err != nil {
 			return err
 		}
 		n := name(page, params.Format)
 		if err := transfer(duo[page&1], out, n, params); err != nil {
-			atomic.StoreInt32(&cancel, 1)
+			cancel.Store(true)
 			<-receive
 			return err
 		}
@@ -41,12 +41,12 @@ func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 	return nil
 }
 
-func work(send chan error, cancel *int32, doc *fitz.Document, duo [2]string, params *Params) {
+func work(send chan error, cancel *atomic.Bool, doc *fitz.Document, duo [2]string, params *Params) {
 	defer close(send)
 	bkg := background(params.Width, params.Height, params.Resize)
 	from := params.FirstPage
 	to := params.LastPage
-	for page := from; page <= to && atomic.LoadInt32(cancel) == 0; page++ {
+	for page := from; page <= to && !cancel.Load(); page++ {
 		err := dump(doc, bkg, duo[page&1], page, params)
 		if send <- err; err != nil {
 			return
