@@ -1,0 +1,38 @@
+name: Release Binaries
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+      - name: Download Dependencies
+        run: go mod download
+      - name: Go Build Unix
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: go build -ldflags="-s -w" -o go-fitz-formpost-${{ github.ref_name }}-${{ matrix.os }}-amd64
+      - name: Go Build Windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: go build -ldflags="-s -w" -o go-fitz-formpost-${{ github.ref_name }}-${{ matrix.os }}-amd64.exe
+      - name: Upload Asset Unix
+        # Note: "Settings > Actions > Workflow permissions > Read and write permissions" must be set
+        if: ${{ matrix.os != 'windows-latest' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: go-fitz-formpost-${{ github.ref_name }}-${{ matrix.os }}-amd64
+      - name: Upload Asset Windows
+        # Note: "Settings > Actions > Workflow permissions > Read and write permissions" must be set
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: go-fitz-formpost-${{ github.ref_name }}-${{ matrix.os }}-amd64.exe
