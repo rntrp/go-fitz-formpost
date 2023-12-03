@@ -35,4 +35,4 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         uses: softprops/action-gh-release@v1
         with:
-          files: go-fitz-formpost-${{ github.ref_name }}-${{ matrix.os }}-amd64.exe
+          files: go-fitz-formpost-${{ github.ref_name }}-win10-ucrt-amd64.exe
