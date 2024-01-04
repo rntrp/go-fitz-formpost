@@ -12,12 +12,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Use MinGW UCRT installation
-        if: ${{ matrix.os == 'windows-latest' }}
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: ucrt64
-          update: true
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
