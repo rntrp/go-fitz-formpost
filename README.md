@@ -34,7 +34,8 @@ If you are updating the dependencies locally, you may want to update `go.sum`:
 $ go mod download
 $ go mod tidy
 ```
-> :warning: **Issues with vendoring**: Unfortunately `go mod vendor` does not pull the header files and binaries from the `go-fitz` repository. This issue is discussed at golang/go/issues/26366. Please stay with `go mod download` instead.
+> [!IMPORTANT]
+> **Issues with vendoring**: Unfortunately `go mod vendor` does not pull the header files and binaries from the `go-fitz` repository. This issue is discussed at golang/go/issues/26366. Please stay with `go mod download` instead.
 
 ### With Docker
 ```bash
