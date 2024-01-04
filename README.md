@@ -2,6 +2,7 @@
 [![Go Version](https://img.shields.io/github/go-mod/go-version/rntrp/go-fitz-formpost)](https://go.dev/dl/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rntrp/go-fitz-formpost)](https://goreportcard.com/report/github.com/rntrp/go-fitz-formpost)
 [![Docker Image](https://img.shields.io/docker/image-size/rntrp/go-fitz-formpost/latest?logo=docker)](https://hub.docker.com/r/rntrp/go-fitz-formpost)
+[![Tests](https://github.com/rntrp/go-fitz-formpost/actions/workflows/tests.yml/badge.svg)](https://github.com/rntrp/go-fitz-formpost/actions/workflows/tests.yml)
 
 # Document to Image Formpost Microservice
 A microservice based on [`go-fitz`](https://github.com/gen2brain/go-fitz), a Go wrapper for the [MuPDF](https://mupdf.com/) Fitz library. Accepts PDF and EPUB documents via `multipart/form-data` POST requests, delivers images in response.
