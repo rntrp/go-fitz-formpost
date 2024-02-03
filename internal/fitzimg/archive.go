@@ -28,7 +28,7 @@ func (w *tarWriter) StartEntry(name string) (io.Writer, error) {
 	return bufio.NewWriter(w.buf), nil
 }
 
-func (w tarWriter) FinishEntry() error {
+func (w *tarWriter) FinishEntry() error {
 	defer w.buf.Reset()
 	hdr := &tar.Header{
 		Name: w.name,
@@ -43,7 +43,7 @@ func (w tarWriter) FinishEntry() error {
 	return nil
 }
 
-func (w tarWriter) Write(f *os.File, name string) (int64, error) {
+func (w *tarWriter) Write(f *os.File, name string) (int64, error) {
 	fi, err := f.Stat()
 	if err != nil {
 		return 0, err
@@ -59,7 +59,9 @@ func (w tarWriter) Write(f *os.File, name string) (int64, error) {
 	return io.Copy(w.tar, f)
 }
 
-func (w tarWriter) Close() error {
+func (w *tarWriter) Close() error {
+	w.buf = nil
+	w.name = ""
 	return w.tar.Close()
 }
 
