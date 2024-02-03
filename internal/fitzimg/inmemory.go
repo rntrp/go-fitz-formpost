@@ -1,10 +1,6 @@
 package fitzimg
 
 import (
-	"archive/tar"
-	"archive/zip"
-	"bufio"
-	"bytes"
 	"image/draw"
 	"io"
 
@@ -12,58 +8,23 @@ import (
 )
 
 func inMemory(doc *fitz.Document, dst io.Writer, params *Params) error {
-	out, closer := initArchive(params.Archive, dst)
-	buf := new(bytes.Buffer)
+	out := initArchive(params.Archive, dst)
 	bkg := background(params.Width, params.Height, params.Resize)
 	from := params.FirstPage
 	to := params.LastPage
 	for page := from; page <= to; page++ {
-		buf.Reset()
-		if err := direct(doc, buf, bkg, out, page, params); err != nil {
+		if err := entry(doc, bkg, out, page, params); err != nil {
 			return err
 		}
 	}
-	if closer != nil {
-		return closer.Close()
-	}
-	return nil
+	return out.Close()
 }
 
-func direct(doc *fitz.Document, buf *bytes.Buffer, bkg draw.Image, dst interface{}, page int, params *Params) error {
-	switch params.Archive {
-	case Tar:
-		return directTar(doc, buf, bkg, dst.(*tar.Writer), page, params)
-	case Zip:
-		return directZip(doc, bkg, dst.(*zip.Writer), page, params)
-	default:
-		return encode(doc, bkg, dst.(io.Writer), page, params)
-	}
-}
-
-func directTar(doc *fitz.Document, buf *bytes.Buffer, bkg draw.Image, dst *tar.Writer, page int, params *Params) error {
-	w := bufio.NewWriter(buf)
-	if err := encode(doc, bkg, w, page, params); err != nil {
-		return err
-	}
-	hdr := &tar.Header{
-		Name: name(page, params.Format),
-		Mode: 0600,
-		Size: int64(buf.Len()),
-	}
-	if err := dst.WriteHeader(hdr); err != nil {
-		return err
-	} else if _, err := buf.WriteTo(dst); err != nil {
-		return err
-	}
-	return nil
-}
-
-func directZip(doc *fitz.Document, bkg draw.Image, dst *zip.Writer, page int, params *Params) error {
-	w, err := dst.Create(name(page, params.Format))
-	if err != nil {
+func entry(doc *fitz.Document, bkg draw.Image, dst ArchiveWriter, page int, params *Params) error {
+	if w, err := dst.StartEntry(name(page, params.Format)); err != nil {
 		return err
 	} else if err := encode(doc, bkg, w, page, params); err != nil {
 		return err
 	}
-	return nil
+	return dst.FinishEntry()
 }

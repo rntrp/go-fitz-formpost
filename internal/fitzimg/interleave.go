@@ -20,7 +20,7 @@ func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 		return err
 	}
 	defer removeTmpDuo(duo)
-	out, closer := initArchive(params.Archive, dst)
+	out := initArchive(params.Archive, dst)
 	receive := make(chan error, 1)
 	cancel := new(atomic.Bool)
 	go work(receive, cancel, doc, duo, params)
@@ -35,10 +35,7 @@ func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 			return err
 		}
 	}
-	if closer != nil {
-		return closer.Close()
-	}
-	return nil
+	return out.Close()
 }
 
 func work(send chan error, cancel *atomic.Bool, doc *fitz.Document, duo [2]string, params *Params) {

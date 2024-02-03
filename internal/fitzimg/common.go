@@ -49,7 +49,7 @@ func background(width, height int, resize Resize) *image.NRGBA {
 	return bkg
 }
 
-func process(doc *fitz.Document, bkg draw.Image, dst string, out interface{}, page int, params *Params) error {
+func process(doc *fitz.Document, bkg draw.Image, dst string, out ArchiveWriter, page int, params *Params) error {
 	if err := dump(doc, bkg, dst, page, params); err != nil {
 		return err
 	}
@@ -70,13 +70,14 @@ func dump(doc *fitz.Document, bkg draw.Image, dst string, page int, params *Para
 	return encode(doc, bkg, img, page, params)
 }
 
-func transfer(dst string, out interface{}, name string, params *Params) error {
+func transfer(dst string, out ArchiveWriter, name string, params *Params) error {
 	img, err := os.OpenFile(dst, os.O_RDONLY, 0400)
 	if err != nil {
 		return err
 	}
 	defer img.Close()
-	return write(params.Archive, out, img, name)
+	_, err = out.Write(img, name)
+	return err
 }
 
 func encode(doc *fitz.Document, bkg draw.Image, dst io.Writer, page int, params *Params) error {

@@ -12,7 +12,7 @@ func serial(doc *fitz.Document, dst io.Writer, params *Params) error {
 		return err
 	}
 	defer removeTmp(tmp)
-	out, closer := initArchive(params.Archive, dst)
+	out := initArchive(params.Archive, dst)
 	bkg := background(params.Width, params.Height, params.Resize)
 	from := params.FirstPage
 	to := params.LastPage
@@ -21,8 +21,5 @@ func serial(doc *fitz.Document, dst io.Writer, params *Params) error {
 			return err
 		}
 	}
-	if closer != nil {
-		return closer.Close()
-	}
-	return nil
+	return out.Close()
 }
