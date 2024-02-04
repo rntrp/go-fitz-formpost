@@ -1,6 +1,7 @@
 package fitzimg
 
 import (
+	"fmt"
 	"image/draw"
 	"io"
 
@@ -14,17 +15,22 @@ func inMemory(doc *fitz.Document, dst io.Writer, params *Params) error {
 	to := params.LastPage
 	for page := from; page <= to; page++ {
 		if err := entry(doc, bkg, out, page, params); err != nil {
-			return err
+			return fmt.Errorf("fitzimg.inMemory page=%d: %w", page, err)
 		}
 	}
-	return out.Close()
+	if err := out.Close(); err != nil {
+		return fmt.Errorf("fitzimg.inMemory out.Close: %w", err)
+	}
+	return nil
 }
 
 func entry(doc *fitz.Document, bkg draw.Image, dst ArchiveWriter, page int, params *Params) error {
 	if w, err := dst.StartEntry(name(page, params.Format)); err != nil {
-		return err
+		return fmt.Errorf("StartEntry: %w", err)
 	} else if err := encode(doc, bkg, w, page, params); err != nil {
-		return err
+		return fmt.Errorf("encode: %w", err)
+	} else if err := dst.FinishEntry(); err != nil {
+		return fmt.Errorf("FinishEntry: %w", err)
 	}
-	return dst.FinishEntry()
+	return nil
 }

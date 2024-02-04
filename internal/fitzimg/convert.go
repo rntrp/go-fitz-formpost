@@ -2,6 +2,7 @@ package fitzimg
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/gen2brain/go-fitz"
@@ -16,7 +17,7 @@ func IsErrorFormatIssue(err error) bool {
 func NumPage(src []byte) (int, error) {
 	doc, err := fitz.NewFromMemory(src)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("fitzimg.NumPage: %w", err)
 	}
 	defer doc.Close()
 	return doc.NumPage(), nil
@@ -25,7 +26,7 @@ func NumPage(src []byte) (int, error) {
 func Convert(src []byte, dst io.Writer, params *Params) error {
 	doc, err := fitz.NewFromMemory(src)
 	if err != nil {
-		return err
+		return fmt.Errorf("fitzimg.Convert: %w", err)
 	}
 	defer doc.Close()
 	switch config.GetProcessingMode() {

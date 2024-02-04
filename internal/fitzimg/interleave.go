@@ -1,6 +1,7 @@
 package fitzimg
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"sync/atomic"
@@ -17,7 +18,7 @@ func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 	}
 	duo, err := initTmpDuo()
 	if err != nil {
-		return err
+		return fmt.Errorf("fitzimg.interleave initTmpDuo: %w", err)
 	}
 	defer removeTmpDuo(duo)
 	out := initArchive(params.Archive, dst)
@@ -26,16 +27,19 @@ func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 	go work(receive, cancel, doc, duo, params)
 	for page := from; page <= to; page++ {
 		if err := <-receive; err != nil {
-			return err
+			return fmt.Errorf("fitzimg.interleave work page=%d: %w", page, err)
 		}
 		n := name(page, params.Format)
 		if err := transfer(duo[page&1], out, n, params); err != nil {
 			cancel.Store(true)
 			<-receive
-			return err
+			return fmt.Errorf("fitzimg.interleave transfer page=%d: %w", page, err)
 		}
 	}
-	return out.Close()
+	if err := out.Close(); err != nil {
+		return fmt.Errorf("fitzimg.interleave out.Close: %w", err)
+	}
+	return nil
 }
 
 func work(send chan error, cancel *atomic.Bool, doc *fitz.Document, duo [2]string, params *Params) {
