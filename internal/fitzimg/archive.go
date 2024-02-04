@@ -35,6 +35,7 @@ func (w *tarWriter) FinishEntry() error {
 		Mode: 0600,
 		Size: int64(w.buf.Len()),
 	}
+	w.name = ""
 	if err := w.tar.WriteHeader(hdr); err != nil {
 		return err
 	} else if _, err := w.buf.WriteTo(w.tar); err != nil {
