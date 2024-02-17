@@ -7,11 +7,12 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/go-chi/httplog/v2"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rntrp/go-fitz-formpost/internal/config"
 	"github.com/rntrp/go-fitz-formpost/internal/rest"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func init() {
@@ -40,7 +41,6 @@ func start() error {
 
 func server(sig chan os.Signal) *http.Server {
 	r := http.NewServeMux()
-	// TODO logger
 	r.HandleFunc("GET /", rest.Index)
 	r.HandleFunc("GET /index.html", rest.Index)
 	r.HandleFunc("GET /live", rest.Live)
@@ -52,7 +52,13 @@ func server(sig chan os.Signal) *http.Server {
 	if config.IsEnableShutdown() {
 		r.HandleFunc("POST /shutdown", shutdownFn(sig))
 	}
-	return &http.Server{Addr: config.GetTCPAddress(), Handler: r}
+	h := httplog.Handler(httplog.NewLogger("GO-FITZ-FORMPOST", httplog.Options{
+		Concise:         true,
+		JSON:            false,
+		RequestHeaders:  false,
+		TimeFieldFormat: time.RFC3339,
+	}))(r)
+	return &http.Server{Addr: config.GetTCPAddress(), Handler: h}
 }
 
 func shutdownFn(sig chan os.Signal) func(http.ResponseWriter, *http.Request) {
