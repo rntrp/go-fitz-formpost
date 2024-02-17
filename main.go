@@ -11,8 +11,6 @@ import (
 	"github.com/rntrp/go-fitz-formpost/internal/config"
 	"github.com/rntrp/go-fitz-formpost/internal/rest"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -41,18 +39,18 @@ func start() error {
 }
 
 func server(sig chan os.Signal) *http.Server {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", rest.Index)
-	r.Get("/index.html", rest.Index)
-	r.Get("/live", rest.Live)
-	r.Post("/convert", rest.Convert)
-	r.Post("/pages", rest.NumPage)
+	r := http.NewServeMux()
+	// TODO logger
+	r.HandleFunc("GET /", rest.Index)
+	r.HandleFunc("GET /index.html", rest.Index)
+	r.HandleFunc("GET /live", rest.Live)
+	r.HandleFunc("POST /convert", rest.Convert)
+	r.HandleFunc("POST /pages", rest.NumPage)
 	if config.IsEnablePrometheus() {
 		r.Handle("/metrics", promhttp.Handler())
 	}
 	if config.IsEnableShutdown() {
-		r.Post("/shutdown", shutdownFn(sig))
+		r.HandleFunc("POST /shutdown", shutdownFn(sig))
 	}
 	return &http.Server{Addr: config.GetTCPAddress(), Handler: r}
 }
