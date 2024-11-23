@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/disintegration/imaging"
+	"github.com/kovidgoyal/imaging"
 	"github.com/rntrp/go-fitz-formpost/internal/fitzimg"
 )
 

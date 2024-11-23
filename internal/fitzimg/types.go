@@ -1,6 +1,6 @@
 package fitzimg
 
-import "github.com/disintegration/imaging"
+import "github.com/kovidgoyal/imaging"
 
 type Archive int
 

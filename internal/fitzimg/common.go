@@ -9,8 +9,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/disintegration/imaging"
 	"github.com/gen2brain/go-fitz"
+	"github.com/kovidgoyal/imaging"
 	"github.com/rntrp/go-fitz-formpost/internal/config"
 )
 
