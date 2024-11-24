@@ -54,7 +54,7 @@ func process(doc *fitz.Document, bkg draw.Image, dst string, out ArchiveWriter, 
 		return err
 	}
 	n := name(page, params.Format)
-	return transfer(dst, out, n, params)
+	return transfer(dst, out, n)
 }
 
 func name(page int, format imaging.Format) string {
@@ -70,7 +70,7 @@ func dump(doc *fitz.Document, bkg draw.Image, dst string, page int, params *Para
 	return encode(doc, bkg, img, page, params)
 }
 
-func transfer(dst string, out ArchiveWriter, name string, params *Params) error {
+func transfer(dst string, out ArchiveWriter, name string) error {
 	img, err := os.OpenFile(dst, os.O_RDONLY, 0400)
 	if err != nil {
 		return err

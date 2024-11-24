@@ -30,7 +30,7 @@ func interleave(doc *fitz.Document, dst io.Writer, params *Params) error {
 			return fmt.Errorf("fitzimg.interleave work page=%d: %w", page, err)
 		}
 		n := name(page, params.Format)
-		if err := transfer(duo[page&1], out, n, params); err != nil {
+		if err := transfer(duo[page&1], out, n); err != nil {
 			cancel.Store(true)
 			<-receive
 			return fmt.Errorf("fitzimg.interleave transfer page=%d: %w", page, err)
