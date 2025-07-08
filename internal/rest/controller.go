@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"cmp"
 	"fmt"
 	"log"
 	"net/http"
@@ -32,11 +33,9 @@ func Convert(w http.ResponseWriter, r *http.Request) {
 	quality, errQ := coerceQuality(format, query.Get("quality"))
 	resize, errRz := coerceResize(query.Get("resize"))
 	resample, errRs := coerceResample(query.Get("resample"))
-	for _, err := range [...]error{errW, errH, errFr, errTo, errF, errO, errQ, errRz, errRs} {
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+	if err := cmp.Or(errW, errH, errFr, errTo, errF, errO, errQ, errRz, errRs); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 	input := handleFileUpload(w, r)
 	if input == nil {
