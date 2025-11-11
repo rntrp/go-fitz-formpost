@@ -112,7 +112,7 @@ func quality(format imaging.Format, value int) []imaging.EncodeOption {
 	}
 }
 
-func resize(img image.Image, bkg draw.Image, params *Params) *image.NRGBA {
+func resize(img image.Image, bkg draw.Image, params *Params) image.Image {
 	switch params.Resize {
 	case FitUpscale:
 		return fitUpscale(img, params.Width, params.Height, params.Resample)
@@ -134,7 +134,7 @@ func resize(img image.Image, bkg draw.Image, params *Params) *image.NRGBA {
 	}
 }
 
-func fitUpscale(img image.Image, w, h int, r imaging.ResampleFilter) *image.NRGBA {
+func fitUpscale(img image.Image, w, h int, r imaging.ResampleFilter) image.Image {
 	b := img.Bounds()
 	if b.Dx() < b.Dy() {
 		// portrait images are bound by height

@@ -27,11 +27,10 @@ func (v *values) print() {
 	buf.WriteString("Environment has been resolved to:\n")
 	val := reflect.Indirect(reflect.ValueOf(v))
 	valType := val.Type()
-	valNumField := val.NumField()
-	for i := 0; i < valNumField; i++ {
+	for i := range val.NumField() {
 		a := valType.Field(i).Name
 		b := val.Field(i).Interface()
-		buf.WriteString(fmt.Sprintf("%-40s= %v\n", a, b))
+		fmt.Fprintf(buf, "%-40s= %v\n", a, b)
 	}
 	log.Print(buf.String())
 }
