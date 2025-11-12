@@ -6,7 +6,7 @@ require (
 	github.com/gen2brain/go-fitz v1.24.15
 	github.com/go-chi/httplog/v2 v2.1.1
 	github.com/joho/godotenv v1.5.1
-	github.com/kovidgoyal/imaging v1.8.9
+	github.com/kovidgoyal/imaging v1.8.8
 	github.com/prometheus/client_golang v1.23.2
 )
 
@@ -18,7 +18,6 @@ require (
 	github.com/jupiterrider/ffi v0.5.1 // indirect
 	github.com/kettek/apng v0.0.0-20250827064933-2bb5f5fcf253 // indirect
 	github.com/kovidgoyal/go-parallel v1.1.1 // indirect
-	github.com/kovidgoyal/go-shm v1.0.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
